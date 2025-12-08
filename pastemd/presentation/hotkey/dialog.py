@@ -4,10 +4,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import Optional, Callable
 
+import os
 from ...utils.logging import log
 from ...utils.win32 import HotkeyChecker, get_dpi_scale
+from ...utils.resources import resource_path
 from ...domains.hotkey.recorder import HotkeyRecorder
 from ...i18n import t
+from ...core.state import app_state
 
 
 class HotkeyDialog:
@@ -27,8 +30,20 @@ class HotkeyDialog:
         self.on_close_callback = on_close
         self.new_hotkey: Optional[str] = None
         
-        self.root = tk.Tk()
+        if app_state.root:
+            self.root = tk.Toplevel(app_state.root)
+        else:
+            self.root = tk.Tk()
+            
         self.root.title(t("hotkey.dialog.title"))
+        
+        # 设置图标
+        try:
+            icon_path = resource_path("assets/icons/logo.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            log(f"Failed to set hotkey dialog icon: {e}")
         
         # 适配高分屏：根据 DPI 缩放窗口大小
         scale = get_dpi_scale()
@@ -231,17 +246,6 @@ class HotkeyDialog:
     def _safe_destroy(self):
         """安全销毁窗口（避免线程问题）"""
         try:
-            self.root.withdraw()  # 先隐藏窗口
-            self.root.update_idletasks()  # 处理待处理的事件
-        except Exception as e:
-            log(f"Error withdrawing window: {e}")
-        
-        try:
-            self.root.quit()
-        except Exception as e:
-            log(f"Error quitting mainloop: {e}")
-        
-        try:
             self.root.destroy()
         except Exception as e:
             # 忽略 Tcl_AsyncDelete 错误，这是 tkinter 在非主线程中的已知问题
@@ -271,7 +275,10 @@ class HotkeyDialog:
     def show(self):
         """显示对话框"""
         try:
-            self.root.mainloop()
+            if isinstance(self.root, tk.Toplevel):
+                self.root.wait_window()
+            else:
+                self.root.mainloop()
         except Exception as e:
             log(f"Error in dialog mainloop: {e}")
         finally:

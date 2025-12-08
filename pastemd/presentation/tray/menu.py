@@ -16,6 +16,7 @@ from ...utils.version_checker import VersionChecker
 from ...i18n import t, iter_languages, get_language, set_language, get_language_label
 from .icon import create_status_icon
 from ..hotkey.dialog import HotkeyDialog
+from ..settings.dialog import SettingsDialog
 
 
 class TrayMenuManager:
@@ -116,6 +117,7 @@ class TrayMenuManager:
             pystray.MenuItem(t("tray.menu.open_save_dir"), self._on_open_save_dir),
             pystray.MenuItem(t("tray.menu.open_log"), self._on_open_log),
             pystray.Menu.SEPARATOR,
+            pystray.MenuItem(t("settings.dialog.title"), self._on_open_settings),
             pystray.MenuItem(t("tray.menu.edit_config"), self._on_edit_config),
             pystray.MenuItem(t("tray.menu.reload_config"), self._on_reload),
             pystray.Menu.SEPARATOR,
@@ -289,6 +291,44 @@ class TrayMenuManager:
             open(log_path, "w", encoding="utf-8").close()
         os.startfile(log_path)
     
+    def _on_open_settings(self, icon, item):
+        """打开设置界面"""
+        def on_settings_save():
+            """设置保存后的回调"""
+            # 刷新菜单以反映可能的配置更改（如语言）
+            set_language(app_state.config.get("language", "zh"))
+            icon.menu = self.build_menu()
+            
+            # 如果热键更改，可能需要重启热键监听
+            if self.restart_hotkey_callback:
+                self.restart_hotkey_callback()
+
+        def show_dialog_on_main():
+            """在主线程显示设置对话框"""
+            try:
+                # 暂停热键监听
+                if self.pause_hotkey_callback:
+                    self.pause_hotkey_callback()
+                    
+                dialog = SettingsDialog(
+                    on_save=on_settings_save,
+                    on_close=self.resume_hotkey_callback
+                )
+                dialog.show()
+            except Exception as e:
+                log(f"Failed to show settings dialog: {e}")
+                self.notification_manager.notify("PasteMD", f"Error opening settings: {e}", ok=False)
+            finally:
+                # 恢复热键监听
+                if self.resume_hotkey_callback:
+                    self.resume_hotkey_callback()
+
+        ui_queue = getattr(app_state, "ui_queue", None)
+        if ui_queue is not None:
+            ui_queue.put(show_dialog_on_main)
+        else:
+            show_dialog_on_main()
+
     def _on_edit_config(self, icon, item):
         """编辑配置文件"""
         config_path = get_config_path()

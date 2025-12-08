@@ -16,6 +16,7 @@ class AppState:
     config: Dict[str, Any] = field(default_factory=dict)
 
     # UI组件引用
+    root: Optional[Any] = None      # tkinter.Tk (Global root window)
     listener: Optional[Any] = None  # pynput.keyboard.GlobalHotKeys
     icon: Optional[Any] = None      # pystray.Icon
 
