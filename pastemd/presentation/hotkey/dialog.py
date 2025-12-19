@@ -8,7 +8,8 @@ import os
 
 from ...config.paths import get_app_icon_path
 from ...utils.logging import log
-from ...utils.win32 import HotkeyChecker, get_dpi_scale
+from ...utils.hotkey_checker import HotkeyChecker
+from ...utils.dpi import get_dpi_scale
 from ...domains.hotkey.recorder import HotkeyRecorder
 from ...i18n import t
 from ...core.state import app_state

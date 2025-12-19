@@ -11,7 +11,7 @@ try:
 except Exception:
     pass
 
-from ..utils.win32 import set_dpi_awareness
+from ..utils.dpi import set_dpi_awareness
 from .. import __version__
 from ..core.state import app_state
 from ..core.singleton import check_single_instance

@@ -5,7 +5,7 @@ from ...domains.hotkey.debounce import DebounceManager
 from ...config.defaults import DEFAULT_CONFIG
 from ...core.state import app_state
 from ...utils.logging import log
-from ...utils.win32 import HotkeyChecker
+from ...utils.hotkey_checker import HotkeyChecker
 from ...i18n import t
 
 

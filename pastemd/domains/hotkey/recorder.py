@@ -4,7 +4,7 @@ from typing import Optional, Callable, Set
 from pynput import keyboard
 
 from ...utils.logging import log
-from ...utils.win32 import HotkeyChecker
+from ...utils.hotkey_checker import HotkeyChecker
 from ...i18n import t
 
 
@@ -102,25 +102,40 @@ class HotkeyRecorder:
         return True  # 继续监听
     
     def _get_key_name(self, key) -> Optional[str]:
-        """获取键名称"""
+        """获取键名称（跨平台）"""
         try:
-            # 修饰键
+            # 修饰键 - 处理 Ctrl
             if key in [keyboard.Key.ctrl, keyboard.Key.ctrl_l, keyboard.Key.ctrl_r]:
                 return "ctrl"
+            # 修饰键 - 处理 Shift
             elif key in [keyboard.Key.shift, keyboard.Key.shift_l, keyboard.Key.shift_r]:
                 return "shift"
+            # 修饰键 - 处理 Alt/Option (macOS)
             elif key in [keyboard.Key.alt, keyboard.Key.alt_l, keyboard.Key.alt_r]:
                 return "alt"
+            # 修饰键 - 处理 Command (macOS) / Windows 键
             elif key == keyboard.Key.cmd:
+                return "cmd"
+            elif key in [keyboard.Key.cmd_l, keyboard.Key.cmd_r]:
                 return "cmd"
             
             # 尝试获取键的名称（适用于特殊键）
             if hasattr(key, 'name'):
-                return key.name.lower()
+                key_name = key.name.lower()
+                # 标准化某些键名
+                if key_name in ['alt_l', 'alt_r', 'alt_gr']:
+                    return "alt"
+                elif key_name in ['ctrl_l', 'ctrl_r']:
+                    return "ctrl"
+                elif key_name in ['shift_l', 'shift_r']:
+                    return "shift"
+                elif key_name in ['cmd_l', 'cmd_r', 'cmd']:
+                    return "cmd"
+                return key_name
             
-            # 普通键：优先使用 vk (虚拟键码)
+            # 普通键：优先使用 vk (虚拟键码) - 主要用于 Windows
             # 这样可以避免组合键时获取到控制字符
-            if hasattr(key, 'vk'):
+            if hasattr(key, 'vk') and key.vk is not None:
                 vk = key.vk
                 # A-Z: 65-90
                 if 65 <= vk <= 90:
@@ -133,6 +148,7 @@ class HotkeyRecorder:
                     return f"num{vk - 96}"
             
             # 最后尝试使用 char（仅当不是控制字符时）
+            # 这在 macOS 上特别有用
             if hasattr(key, 'char') and key.char:
                 # 过滤控制字符（ASCII < 32）
                 if ord(key.char) >= 32:

@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageDraw
 
 from ...config.paths import get_app_png_path
-from ...utils.win32 import get_dpi_scale
+from ...utils.dpi import get_dpi_scale
 
 
 def create_fallback_icon(ok: bool = True, flash: bool = False) -> Image.Image:

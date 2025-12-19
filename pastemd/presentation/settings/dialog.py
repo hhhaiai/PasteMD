@@ -9,7 +9,7 @@ from typing import Optional, Callable, Dict, Any
 
 from ...config.paths import get_app_icon_path
 from ...utils.logging import log
-from ...utils.win32 import get_dpi_scale
+from ...utils.dpi import get_dpi_scale
 from ...i18n import t, iter_languages, get_language_label
 from ...core.state import app_state
 from ...config.loader import ConfigLoader
