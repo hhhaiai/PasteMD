@@ -77,16 +77,25 @@ def _fix_single_dollar_blocks(text: str) -> str:
     lines = text.split('\n')
     new_lines = []
     in_code_block = False
+    code_fence_char = ""
     in_dollar_block = False
     
     for line in lines:
         stripped = line.strip()
         
         # 1. 代码块检测
-        if stripped.startswith('```'):
-            in_code_block = not in_code_block
-            new_lines.append(line)
-            continue
+        if stripped.startswith('```') or stripped.startswith('~~~'):
+            fence = stripped[:3]
+            if not in_code_block:
+                in_code_block = True
+                code_fence_char = fence
+                new_lines.append(line)
+                continue
+            elif stripped.startswith(code_fence_char):
+                in_code_block = False
+                code_fence_char = ""
+                new_lines.append(line)
+                continue
             
         if in_code_block:
             new_lines.append(line)
