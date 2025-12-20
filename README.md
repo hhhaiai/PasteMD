@@ -332,6 +332,14 @@ pyinstaller --clean -F -w -n PasteMD
 
 如果有什么想法和好建议，欢迎issue交流！🤯🤯🤯
 
+
+也欢迎加入 **PasteMD使用交流群** 与其他用户交流：
+<div align="center">
+  <img src="docs/img/qrcode.jpg" alt="PasteMD交流群二维码" width="200" />
+  <br>
+  <sub>扫码加入PasteMD QQ交流群</sub>
+</div>
+
 希望这个小工具对你有帮助，欢迎请作者👻喝杯咖啡☕～你的支持会让我更有动力持续修复问题、完善功能、适配更多场景并保持长期维护。感谢每一份支持！
 
 <img src="docs/gif/atri/flower.gif"

@@ -317,7 +317,16 @@ Every star helps — thank you for sharing PasteMD with more users.
 
 ## ☕ Support & Donation
 
+
 If PasteMD saves you time, consider buying the author a coffee — your support helps prioritize fixes, enhancements, and new integrations.
+
+Also welcome to join the **PasteMD User Group** for discussion and support:
+
+<div align="center">
+  <img src="../../docs/img/qrcode.jpg" alt="PasteMD QQ Group QR Code" width="200" />
+  <br>
+  <sub>Scan to join the PasteMD QQ group</sub>
+</div>
 
 <img src="../../docs/gif/atri/flower.gif"
      alt="give you a flower"
