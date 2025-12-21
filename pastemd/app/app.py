@@ -5,9 +5,11 @@ import threading
 import queue
 import tkinter as tk
 
+# 设置 Windows 应用程序 ID (仅在 Windows 上)
 try:
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("RichQAQ.PasteMD")
+    if sys.platform == "win32":
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("RichQAQ.PasteMD")
 except Exception:
     pass
 
