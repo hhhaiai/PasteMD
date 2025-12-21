@@ -1,6 +1,7 @@
 """Tray menu construction and callbacks."""
 
 import os
+import subprocess
 import pystray
 import threading
 import webbrowser
@@ -10,9 +11,10 @@ from ...core.state import app_state
 from ...config.loader import ConfigLoader
 from ...config.paths import get_log_path, get_config_path
 from ...domains.notification.manager import NotificationManager
-from ...utils.fs import ensure_dir
+from ...utils.fs import ensure_dir, open_dir, open_file
 from ...utils.logging import log
 from ...utils.version_checker import VersionChecker
+from ...utils.system_detect import is_windows, is_macos
 from ...i18n import t, iter_languages, get_language, set_language, get_language_label, get_no_app_action_map
 from .icon import create_status_icon
 from ..hotkey.dialog import HotkeyDialog
@@ -255,7 +257,7 @@ class TrayMenuManager:
         save_dir = app_state.config.get("save_dir", "")
         save_dir = os.path.expandvars(save_dir)
         ensure_dir(save_dir)
-        os.startfile(save_dir)
+        open_dir(save_dir)
     
     def _on_open_log(self, icon, item):
         """打开日志文件"""
@@ -263,7 +265,7 @@ class TrayMenuManager:
         if not os.path.exists(log_path):
             # 创建空日志文件
             open(log_path, "w", encoding="utf-8").close()
-        os.startfile(log_path)
+        open_file(log_path)
     
     def _on_open_settings(self, icon, item):
         """打开设置界面"""

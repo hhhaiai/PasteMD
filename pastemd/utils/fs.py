@@ -2,16 +2,42 @@
 
 import os
 import pathlib
+import subprocess
 import tempfile
 import re
 from datetime import datetime
 from typing import Optional, List
 from bs4 import BeautifulSoup
+from .system_detect import is_windows, is_macos
 
 
 def ensure_dir(path: str) -> None:
     """确保目录存在，如不存在则创建"""
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+
+
+def open_dir(path: str) -> None:
+    """在文件管理器中打开目录"""
+    path = os.path.abspath(path)
+    if os.path.isdir(path):
+        if is_windows():
+            os.startfile(path)
+        elif is_macos():
+            subprocess.Popen(['open', path])
+        else:
+            subprocess.Popen(['xdg-open', path])
+
+
+def open_file(path: str) -> None:
+    """使用默认应用打开文件"""
+    path = os.path.abspath(path)
+    if os.path.isfile(path):
+        if is_windows():
+            os.startfile(path)
+        elif is_macos():
+            subprocess.Popen(['open', path])
+        else:
+            subprocess.Popen(['xdg-open', path])
 
 
 def extract_title_from_markdown(md_text: str, max_chars: int = 30) -> Optional[str]:

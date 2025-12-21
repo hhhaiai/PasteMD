@@ -14,6 +14,7 @@ except Exception:
     pass
 
 from ..utils.dpi import set_dpi_awareness
+from ..utils.system_detect import is_macos
 from .. import __version__
 from ..core.state import app_state
 from ..core.singleton import check_single_instance
@@ -136,11 +137,45 @@ def main() -> None:
         # 启动后台版本检查（无需显示通知）
         check_update_in_background(notification_manager, tray_menu_manager)
         
-        # 启动托盘（改为后台线程，避免阻塞主线程）
+        # 获取托盘运行器
         tray_runner = container.get_tray_runner()
-        threading.Thread(target=tray_runner.run, daemon=True).start()
+        
+        # macOS 上托盘必须在主线程，Windows 上 tk 必须在主线程
+        if is_macos():
+            # macOS: 托盘在主线程，UI 队列在后台处理
+            # UI 队列处理函数（在后台线程运行）
+            def process_ui_queue_background():
+                while True:
+                    try:
+                        quit_event = getattr(app_state, 'quit_event', None)
+                        if quit_event and quit_event.is_set():
+                            break
+                        
+                        # 阻塞获取任务，设置超时避免无限等待
+                        try:
+                            task = ui_queue.get(timeout=0.1)
+                            if task is None:
+                                break
+                            try:
+                                task()
+                            except Exception as e:
+                                log(f"UI task error: {e}")
+                        except queue.Empty:
+                            continue
+                    except Exception as e:
+                        log(f"UI queue processing error: {e}")
+                        break
+            
+            # 启动后台 UI 队列处理线程
+            threading.Thread(target=process_ui_queue_background, daemon=True).start()
+            
+            # 在主线程运行托盘（会阻塞）
+            tray_runner.run()
+        else:
+            # Windows: 托盘在后台线程，tk 在主线程
+            threading.Thread(target=tray_runner.run, daemon=True).start()
 
-        # UI 队列处理函数
+        # UI 队列处理函数（仅用于 Windows）
         def process_ui_queue():
             try:
                 # 检查退出事件
@@ -182,11 +217,11 @@ def main() -> None:
             except Exception as e:
                 log(f"Error during window cleanup: {e}")
 
-        # 启动队列处理
-        root.after(100, process_ui_queue)
-        
-        # 进入主事件循环
-        root.mainloop()
+        # 启动队列处理（仅用于 Windows）
+        if not is_macos():
+            root.after(100, process_ui_queue)
+            # 进入主事件循环
+            root.mainloop()
         
     except KeyboardInterrupt:
         log("Application interrupted by user")
