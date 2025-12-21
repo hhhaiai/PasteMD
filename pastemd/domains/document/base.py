@@ -1,72 +1,26 @@
-"""Base class for document inserters."""
+"""Base classes for document placement."""
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Union
-
-from ...utils.win32.com import ensure_com
+from ...core.types import PlacementResult
 
 
-class BaseDocumentInserter(ABC):
-    """文档插入器基类（用于 Word/WPS 文字）"""
-    
-    def __init__(self, prog_id: Union[str, List[str]], app_name: str):
-        """
-        初始化插入器
-        
-        Args:
-            prog_id: COM ProgID 或 ProgID 列表 (如 "Word.Application" 或 ["kwps.Application", "KWPS.Application"])
-            app_name: 应用名称 (如 "Word" 或 "WPS 文字")
-        """
-        # 统一转为列表处理
-        self.prog_ids = [prog_id] if isinstance(prog_id, str) else prog_id
-        self.prog_id = self.prog_ids[0]  # 保持向后兼容
-        self.app_name = app_name
-    
-    @ensure_com
-    @abstractmethod
-    def insert(self, docx_path: str, move_cursor_to_end: bool) -> bool:
-        """
-        将 DOCX 文件插入到应用当前光标位置
-        
-        Args:
-            docx_path: DOCX 文件路径
-            move_cursor_to_end: 插入后是否将光标移动到插入内容的末尾
-            
-        Returns:
-            True 如果插入成功
-            
-        Raises:
-            InsertError: 插入失败时
-        """
-        pass
+class BaseDocumentPlacer(ABC):
+    """文档内容落地器基类"""
     
     @abstractmethod
-    def _get_application(self) -> Any:
+    def place(self, docx_bytes: bytes, config: dict) -> PlacementResult:
         """
-        获取应用程序实例
-        
-        Returns:
-            应用程序对象
-            
-        Raises:
-            Exception: 无法获取实例时
-        """
-        pass
-    
-    @abstractmethod
-    def _perform_insertion(self, app: Any, docx_path: str, move_cursor_to_end: bool) -> bool:
-        """
-        执行实际的插入操作
+        将 DOCX 内容落地到目标应用
         
         Args:
-            app: 应用程序对象
-            docx_path: DOCX 文件路径
-            move_cursor_to_end: 插入后是否将光标移动到插入内容的末尾
+            docx_bytes: DOCX 文件字节流
+            config: 配置字典
             
         Returns:
-            True 如果插入成功
+            PlacementResult: 落地结果
             
-        Raises:
-            InsertError: 插入失败时
+        Note:
+            ❌ 不做优雅降级,失败即返回错误
+            ✅ 由 Workflow 决定如何处理失败(通知用户/记录日志)
         """
         pass

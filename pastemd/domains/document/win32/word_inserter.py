@@ -4,16 +4,28 @@ import time
 import win32com.client
 from win32com.client import gencache
 
-from .base import BaseDocumentInserter
-from ...utils.win32.com import ensure_com
-from ...utils.logging import log
-from ...core.constants import WORD_INSERT_RETRY_COUNT, WORD_INSERT_RETRY_DELAY
-from ...core.errors import InsertError
+from ....utils.win32.com import ensure_com
+from ....utils.logging import log
+from ....core.constants import WORD_INSERT_RETRY_COUNT, WORD_INSERT_RETRY_DELAY
+from ....core.errors import InsertError
 
 
-class BaseWordInserter(BaseDocumentInserter):
+class BaseWordInserter:
     """Word 类文档插入器基类（适用于 Word 和 WPS 文字）"""
     
+    def __init__(self, prog_id, app_name: str):
+        """
+        初始化插入器
+        
+        Args:
+            prog_id: COM ProgID 或 ProgID 列表 (如 "Word.Application" 或 ["kwps.Application", "KWPS.Application"])
+            app_name: 应用名称 (如 "Word" 或 "WPS 文字")
+        """
+        # 统一转为列表处理
+        self.prog_ids = [prog_id] if isinstance(prog_id, str) else prog_id
+        self.prog_id = self.prog_ids[0]  # 保持向后兼容
+        self.app_name = app_name
+
     @ensure_com
     def insert(self, docx_path: str, move_cursor_to_end: bool = True) -> bool:
         """

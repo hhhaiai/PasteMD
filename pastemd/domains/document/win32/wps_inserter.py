@@ -3,10 +3,10 @@
 import time
 import win32com.client
 
-from .word import BaseWordInserter
-from ...utils.logging import log
-from ...utils.win32 import cleanup_background_wps_processes
-from ...core.constants import WORD_INSERT_RETRY_COUNT, WORD_INSERT_RETRY_DELAY
+from .word_inserter import BaseWordInserter
+from ....utils.logging import log
+from ....utils.win32 import cleanup_background_wps_processes
+from ....core.constants import WORD_INSERT_RETRY_COUNT, WORD_INSERT_RETRY_DELAY
 
 
 class WPSInserter(BaseWordInserter):

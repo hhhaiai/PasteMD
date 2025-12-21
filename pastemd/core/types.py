@@ -1,8 +1,27 @@
 """Common type aliases and protocols."""
 
 from enum import Enum
-from typing import Protocol, Any, Dict, Callable, Literal
+from typing import Protocol, Any, Dict, Callable, Literal, Optional
 from abc import abstractmethod
+
+
+PlacementMethod = Literal["com", "applescript", "clipboard_bridge"]
+
+
+class PlacementResult:
+    """内容落地结果"""
+    
+    def __init__(
+        self, 
+        success: bool, 
+        method: Optional[PlacementMethod] = None,
+        error: Optional[str] = None, 
+        metadata: Optional[dict] = None
+    ):
+        self.success = success
+        self.method = method
+        self.error = error
+        self.metadata = metadata or {}
 
 
 class NoAppAction(str, Enum):
