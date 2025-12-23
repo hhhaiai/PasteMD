@@ -1,33 +1,35 @@
--- 修复不兼容的 LaTeX 语法
--- 在 Math 节点中应用替换规则，处理 Pandoc 不支持的 LaTeX 命令
-
--- 替换规则列表
-local replacements = {
-  -- 将 {\kern 10pt} 或 \kern 10pt 替换为 \qquad
-  { pattern = "{\\kern%s+%d+pt}", replacement = "\\qquad" },
-  { pattern = "\\kern%s+%d+pt",  replacement = "\\qquad" },
-  -- 可以在这里添加更多规则
+-- 配置表：将常用的正则模式映射为目标替换字符串
+-- 优势：方便扩展，只需在 mappings 中添加新项即可
+local mappings = {
+  -- 匹配 \kern 或 {\kern} 后跟数值和单位 (pt, em, cm, mm, ex, bp)
+  -- 模式解释：\\kern%s*%-?%d*%.?%d+%a%a
+  { 
+    pattern = "{\\kern%s*[^}]+}", 
+    replacement = "\\qquad" 
+  },
+  { 
+    pattern = "\\kern%s*%-?%d*%.?%d+%a%a", 
+    replacement = "\\qquad" 
+  },
+  
+  -- 示例：在此处添加更多扩展规则
+  -- { pattern = "\\mbox%s*(%b{})", replacement = "\\text%1" }, 
 }
 
-local function latex_replacements(math_content)
-  local result = math_content
-  
-  -- 应用所有替换规则
-  for _, rule in ipairs(replacements) do
-    result = result:gsub(rule.pattern, rule.replacement)
+--- 核心处理逻辑：遍历配置表进行文本替换
+local function apply_replacements(content)
+  for _, rule in ipairs(mappings) do
+    content = content:gsub(rule.pattern, rule.replacement)
   end
-  
-  return result
+  return content
 end
 
-local function process_math(el)
-  -- 处理 Math 元素（行内公式和块级公式）
-  el.text = latex_replacements(el.text)
-  return el
-end
-
+--- Pandoc 过滤器入口
 return {
   {
-    Math = process_math
+    Math = function(el)
+      el.text = apply_replacements(el.text)
+      return el
+    end
   }
 }
