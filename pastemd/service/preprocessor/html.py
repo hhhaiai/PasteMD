@@ -1,7 +1,8 @@
 """HTML content preprocessor."""
 
+from bs4 import BeautifulSoup
 from .base import BasePreprocessor
-from ...utils.html_formatter import clean_html_content
+from ...utils.html_formatter import clean_html_content, convert_strikethrough_to_del, remove_empty_paragraphs, unwrap_li_paragraphs
 from ...utils.logging import log
 
 
@@ -27,8 +28,19 @@ class HtmlPreprocessor(BasePreprocessor):
         log("Preprocessing HTML content")
 
         # 使用 html_formatter 进行清理
-        html = clean_html_content(html, self.config)
+        soup = BeautifulSoup(html, "html.parser")
+        clean_html_content(soup, self.config)
 
-        # 未来可扩展其他处理...
+        if self.config.get("convert_strikethrough", True):
+            convert_strikethrough_to_del(soup)
 
-        return html
+        unwrap_li_paragraphs(soup)
+        remove_empty_paragraphs(soup)
+
+        html_output = str(soup)
+        
+        # 仅在 HTML 不包含 DOCTYPE 时才添加
+        if "<!DOCTYPE" not in html_output.upper():
+            html_output = f"<!DOCTYPE html>\n<meta charset='utf-8'>\n{html_output}"
+        
+        return html_output

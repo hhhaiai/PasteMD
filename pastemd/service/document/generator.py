@@ -132,3 +132,42 @@ class DocumentGenerator:
             )
         
         return docx_bytes
+
+    def convert_html_to_markdown_text(self, html_text: str, config: dict) -> str:
+        """
+        将 HTML 文本转换为 Markdown 文本（用于富文本粘贴/公式保留链路）。
+
+        Raises:
+            PandocError: 转换失败时
+        """
+        self._ensure_pandoc_integration()
+        return self._pandoc_integration.convert_html_to_markdown_text(html_text)  # type: ignore[union-attr]
+
+    def convert_markdown_to_html_text(self, md_text: str, config: dict) -> str:
+        """
+        将 Markdown 文本转换为 HTML 文本（用于富文本粘贴）。
+
+        Notes:
+            - 通过 Keep_original_formula=True 可把数学节点改成普通文本 `$...$` / `$$...$$`
+        """
+        self._ensure_pandoc_integration()
+        return self._pandoc_integration.convert_markdown_to_html_text(  # type: ignore[union-attr]
+            md_text,
+            Keep_original_formula=config.get("Keep_original_formula", True),
+            enable_latex_replacements=config.get("enable_latex_replacements", True),
+            custom_filters=config.get("pandoc_filters", []),
+            cwd=config.get("save_dir"),
+        )
+
+    def convert_markdown_to_rtf_bytes(self, md_text: str, config: dict) -> bytes:
+        """
+        将 Markdown 文本转换为 RTF 字节流（用于富文本粘贴兜底）。
+        """
+        self._ensure_pandoc_integration()
+        return self._pandoc_integration.convert_markdown_to_rtf_bytes(  # type: ignore[union-attr]
+            md_text,
+            Keep_original_formula=config.get("Keep_original_formula", True),
+            enable_latex_replacements=config.get("enable_latex_replacements", True),
+            custom_filters=config.get("pandoc_filters", []),
+            cwd=config.get("save_dir"),
+        )

@@ -8,7 +8,7 @@ class BaseDocumentPlacer(ABC):
     """文档内容落地器基类"""
     
     @abstractmethod
-    def place(self, docx_bytes: bytes, config: dict) -> PlacementResult:
+    def place(self, docx_bytes: bytes, config: dict, **kwargs) -> PlacementResult:
         """
         将 DOCX 内容落地到目标应用
         

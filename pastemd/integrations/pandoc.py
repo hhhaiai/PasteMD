@@ -115,6 +115,125 @@ class PandocIntegration:
         # stdout 也是 bytes，自行按 UTF-8 解码
         return result.stdout.decode("utf-8", "ignore")
 
+    def convert_html_to_markdown_text(self, html_text: str) -> str:
+        """
+        将 HTML 转换为 Markdown 文本（保留 $...$ 数学语法）。
+        """
+        return self._convert_html_to_md(html_text)
+
+    def convert_markdown_to_html_text(
+        self,
+        md_text: str,
+        *,
+        Keep_original_formula: bool = False,
+        enable_latex_replacements: bool = True,
+        custom_filters: Optional[List[str]] = None,
+        cwd: Optional[str] = None,
+    ) -> str:
+        """
+        将 Markdown 转换为 HTML 文本（用于富文本粘贴）。
+
+        Note:
+            - Keep_original_formula=True 时，会用 keep-latex-math.lua 将数学节点改成普通文本 `$...$` / `$$...$$`。
+            - 输出为 HTML fragment
+        """
+        cmd = [
+            self.pandoc_path,
+            "-f", "markdown+tex_math_dollars+raw_tex+tex_math_double_backslash+tex_math_single_backslash",
+            "-t", "html",
+            "-o", "-",
+            "--wrap", "none",
+            "--standalone",
+        ]
+        if enable_latex_replacements:
+            cmd += ["--lua-filter", LUA_LATEX_REPLACEMENTS]
+        if Keep_original_formula:
+            cmd += ["--lua-filter", LUA_KEEP_ORIGINAL_FORMULA]
+        cmd += self._build_filter_args(custom_filters)
+
+        # 确保工作目录存在且可写
+        if cwd:
+            cwd = os.path.expandvars(cwd)
+            os.makedirs(cwd, exist_ok=True)
+
+        startupinfo = None
+        creationflags = 0
+        if os.name == "nt":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            creationflags = subprocess.CREATE_NO_WINDOW
+
+        result = subprocess.run(
+            cmd,
+            input=md_text.encode("utf-8"),
+            capture_output=True,
+            text=False,
+            shell=False,
+            startupinfo=startupinfo,
+            creationflags=creationflags,
+            cwd=cwd,
+        )
+        if result.returncode != 0:
+            err = (result.stderr or b"").decode("utf-8", "ignore")
+            log(f"Pandoc Markdown to HTML error: {err}")
+            raise PandocError(err or "Pandoc Markdown to HTML conversion failed")
+
+        return result.stdout.decode("utf-8", "ignore")
+
+    def convert_markdown_to_rtf_bytes(
+        self,
+        md_text: str,
+        *,
+        Keep_original_formula: bool = False,
+        enable_latex_replacements: bool = True,
+        custom_filters: Optional[List[str]] = None,
+        cwd: Optional[str] = None,
+    ) -> bytes:
+        """
+        将 Markdown 转换为 RTF 字节（用于富文本粘贴兜底）。
+        """
+        cmd = [
+            self.pandoc_path,
+            "-f", "markdown+tex_math_dollars+raw_tex+tex_math_double_backslash+tex_math_single_backslash",
+            "-t", "rtf",
+            "-o", "-",
+            "--standalone",
+        ]
+        if enable_latex_replacements:
+            cmd += ["--lua-filter", LUA_LATEX_REPLACEMENTS]
+        if Keep_original_formula:
+            cmd += ["--lua-filter", LUA_KEEP_ORIGINAL_FORMULA]
+        cmd += self._build_filter_args(custom_filters)
+
+        # 确保工作目录存在且可写
+        if cwd:
+            cwd = os.path.expandvars(cwd)
+            os.makedirs(cwd, exist_ok=True)
+
+        startupinfo = None
+        creationflags = 0
+        if os.name == "nt":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            creationflags = subprocess.CREATE_NO_WINDOW
+
+        result = subprocess.run(
+            cmd,
+            input=md_text.encode("utf-8"),
+            capture_output=True,
+            text=False,
+            shell=False,
+            startupinfo=startupinfo,
+            creationflags=creationflags,
+            cwd=cwd,
+        )
+        if result.returncode != 0:
+            err = (result.stderr or b"").decode("utf-8", "ignore")
+            log(f"Pandoc Markdown to RTF error: {err}")
+            raise PandocError(err or "Pandoc Markdown to RTF conversion failed")
+
+        return result.stdout
+
     def convert_to_docx_bytes(self, md_text: str, reference_docx: Optional[str] = None, Keep_original_formula: bool = False, enable_latex_replacements: bool = True, custom_filters: Optional[List[str]] = None, cwd: Optional[str] = None) -> bytes:
         """
         用 stdin 喂入 Markdown，直接把 DOCX 从 stdout 读到内存（无任何输入文件写盘）

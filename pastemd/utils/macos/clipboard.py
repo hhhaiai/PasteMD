@@ -4,14 +4,27 @@ import pyperclip
 from AppKit import (
     NSPasteboard,
     NSPasteboardTypeHTML,
+    NSPasteboardTypeRTF,
+    NSPasteboardItem,
     NSPasteboardTypeString,
     NSFilenamesPboardType,
     NSURL,
 )
+from Foundation import NSData
 from ...core.errors import ClipboardError
 from ...core.state import app_state
 from ..clipboard_file_utils import read_file_with_encoding, filter_markdown_files, read_markdown_files
 from ..logging import log
+
+DOCX_UTIS = [
+    "org.openxmlformats-officedocument.wordprocessingml.document",
+    "org.openxmlformats.wordprocessingml.document",   # 有些环境/资料用这个 :contentReference[oaicite:2]{index=2}
+    "com.microsoft.word.docx",                        # 试探性补一个（不保证 Word 用它）
+]
+
+RTF_UTI = "public.rtf"
+HTML_UTI = "public.html"
+PLAIN_UTI = "public.utf8-plain-text"
 
 
 def get_clipboard_text() -> str:
@@ -96,6 +109,56 @@ def get_clipboard_html(config: dict | None = None) -> str:
 
     except Exception as e:
         raise ClipboardError(f"Failed to read HTML from clipboard: {e}")
+
+
+def set_clipboard_rich_text(
+    *,
+    html: str | None = None,
+    rtf_bytes: bytes | None = None,
+    docx_bytes: bytes | None = None,
+    text: str | None = None,
+) -> None:
+    """
+    写入富文本剪贴板（HTML/RTF/纯文本可多格式同时写入）。
+
+    Note:
+        - 目标应用会优先选择其支持的格式（WPS 文字通常偏好 HTML）。
+    """
+    try:
+        pasteboard = NSPasteboard.generalPasteboard()
+        pasteboard.clearContents()
+
+        item = NSPasteboardItem.alloc().init()
+
+        # 1) DOCX（写多个 UTI，尽量覆盖 Word 的选择）
+        if docx_bytes is not None:
+            docx_data = NSData.dataWithBytes_length_(docx_bytes, len(docx_bytes))
+            for uti in DOCX_UTIS:
+                item.setData_forType_(docx_data, uti)
+                log(f"set DOCX type={uti} len={len(docx_bytes)}")
+
+        # 2) RTF（确保样式最容易被 Word 吃到）
+        if rtf_bytes is not None:
+            rtf_data = NSData.dataWithBytes_length_(rtf_bytes, len(rtf_bytes))
+            item.setData_forType_(rtf_data, NSPasteboardTypeRTF)
+            log(f"set RTF type={NSPasteboardTypeRTF} len={len(rtf_bytes)}")
+            
+        # 3) HTML（再给一个富文本备选）
+        if html is not None:
+            html_data = NSData.dataWithBytes_length_(html.encode("utf-8"), len(html.encode("utf-8")))
+            item.setData_forType_(html_data, NSPasteboardTypeHTML)
+            log(f"set HTML type={NSPasteboardTypeHTML} len={len(html.encode('utf-8'))}")
+
+        # 4) Plain（兜底）
+        if text is not None:
+            item.setString_forType_(text, PLAIN_UTI)
+            log(f"set PLAIN type={PLAIN_UTI} len={len(text.encode('utf-8'))}")
+        
+        wrote = pasteboard.writeObjects_([item])
+        if not wrote:
+            raise ClipboardError("Failed to write rich text to clipboard")
+    except Exception as e:
+        raise ClipboardError(f"Failed to write rich text to clipboard: {e}")
 
 
 # ============================================================
@@ -209,4 +272,3 @@ def read_markdown_files_from_clipboard() -> tuple[bool, list[tuple[str, str]], l
     """
     md_files = get_markdown_files_from_clipboard()
     return read_markdown_files(md_files)
-

@@ -229,6 +229,6 @@
     "placer.macos_excel.applescript_failed": "AppleScript execution failed",
     "placer.macos_excel.script_execution_failed": "AppleScript execution failed: {error}",
     "placer.macos_excel.script_timeout": "AppleScript execution timeout (30 seconds)",
-    "placer.macos_wps.not_supported": "macOS WPS does not support automatic insertion\n\nSolutions:\n1. Use Microsoft Word (recommended)\n2. Or set no_app_action to 'clipboard' in settings,\n   then manually paste the generated file into WPS",
+    "placer.macos_wps.not_supported": "macOS WPS insertion is not available in this mode.\n\nNotes:\n- WPS on macOS uses clipboard rich-text paste (HTML/RTF) and may require Accessibility/Automation permissions.",
     "placer.macos_wps_excel.not_supported": "macOS WPS Spreadsheet does not support automatic insertion\n\nSolutions:\n1. Use Microsoft Excel (recommended)\n2. Or set no_app_action to 'clipboard' in settings,\n   then manually paste the generated file into WPS Spreadsheet"
 }
