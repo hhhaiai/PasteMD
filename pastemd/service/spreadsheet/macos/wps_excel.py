@@ -13,6 +13,7 @@ from ....i18n import t
 from ....utils.logging import log
 
 from ....utils.clipboard import set_clipboard_rich_text, simulate_paste
+from ....utils.macos.clipboard import preserve_clipboard
 
 
 def _wrap_tag(tag: str, content: str) -> str:
@@ -132,8 +133,9 @@ class WPSExcelPlacer(BaseSpreadsheetPlacer):
             tsv_text = _table_to_tsv(table_data)
 
             # WPS 表格通常能吃下 HTML table；Plain TSV 作为兜底。
-            set_clipboard_rich_text(html=html_text, text=tsv_text)
-            simulate_paste()
+            with preserve_clipboard():
+                set_clipboard_rich_text(html=html_text, text=tsv_text)
+                simulate_paste()
 
             return PlacementResult(
                 success=True,

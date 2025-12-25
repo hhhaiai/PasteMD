@@ -186,6 +186,17 @@ def main() -> None:
             except Exception as exc:
                 log(f"Failed to start IPC server: {exc}")
 
+            # macOS: Finder/Launchpad 二次打开已运行的 .app 通常不会启动新进程，
+            # 而是发送 Reopen 事件；这里显式捕获并唤起设置页。
+            try:
+                from ..utils.macos.reopen import install_reopen_handler
+
+                install_reopen_handler(
+                    lambda: tray_menu_manager._on_open_settings(app_state.icon, None)  # noqa: SLF001
+                )
+            except Exception as exc:
+                log(f"Failed to install macOS reopen handler: {exc}")
+
         # UI 队列处理函数
         def process_ui_queue():
             try:

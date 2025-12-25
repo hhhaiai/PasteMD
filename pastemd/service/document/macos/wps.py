@@ -9,6 +9,7 @@ from ....core.types import PlacementResult
 from ....utils.logging import log
 from ....i18n import t
 from ....utils.clipboard import set_clipboard_rich_text, simulate_paste
+from ....utils.macos.clipboard import preserve_clipboard
 
 
 class WPSPlacer(BaseDocumentPlacer):
@@ -34,10 +35,12 @@ class WPSPlacer(BaseDocumentPlacer):
             # rtf_bytes = kwargs.get("_rtf_bytes")
             plain_text = kwargs.get("_plain_text")
             html_text = kwargs.get("_html_text")
-            set_clipboard_rich_text(
-                html=html_text, rtf_bytes=None, text=plain_text, docx_bytes=None
-            )
-            simulate_paste()
+            # WPS 依赖剪贴板富文本粘贴；这里尽量不污染用户原生剪贴板。
+            with preserve_clipboard():
+                set_clipboard_rich_text(
+                    html=html_text, rtf_bytes=None, text=plain_text, docx_bytes=None
+                )
+                simulate_paste()
 
             return PlacementResult(success=True, method="clipboard_rtf_html")
         except Exception as e:

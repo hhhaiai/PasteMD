@@ -1,5 +1,10 @@
 """macOS clipboard operations using AppKit.NSPasteboard."""
 
+from __future__ import annotations
+
+import contextlib
+import time
+
 import pyperclip
 from AppKit import (
     NSPasteboard,
@@ -25,6 +30,91 @@ DOCX_UTIS = [
 RTF_UTI = "public.rtf"
 HTML_UTI = "public.html"
 PLAIN_UTI = "public.utf8-plain-text"
+
+
+def _nsdata_to_bytes(data: NSData | None) -> bytes | None:
+    if data is None:
+        return None
+    try:
+        return bytes(data)
+    except Exception:
+        try:
+            return data.bytes()  # type: ignore[attr-defined]
+        except Exception:
+            return None
+
+
+def _snapshot_pasteboard() -> list[dict[str, bytes]]:
+    """
+    Best-effort snapshot of the general pasteboard.
+
+    We store raw bytes for each (item, type). This is not perfect for every
+    exotic pasteboard type, but it preserves the vast majority of real-world
+    clipboard contents (text/rtf/html/images/files, etc.).
+    """
+    pasteboard = NSPasteboard.generalPasteboard()
+    items = pasteboard.pasteboardItems() or []
+
+    snapshot: list[dict[str, bytes]] = []
+    for item in items:
+        types = item.types() or []
+        item_data: dict[str, bytes] = {}
+        for t in types:
+            try:
+                t_str = str(t)
+                data = _nsdata_to_bytes(item.dataForType_(t))
+                if data is not None:
+                    item_data[t_str] = data
+                    continue
+                # Fallback: some types may only expose string values.
+                s = item.stringForType_(t)
+                if s is not None:
+                    item_data[t_str] = str(s).encode("utf-8")
+            except Exception:
+                continue
+        snapshot.append(item_data)
+
+    return snapshot
+
+
+def _restore_pasteboard(snapshot: list[dict[str, bytes]]) -> None:
+    pasteboard = NSPasteboard.generalPasteboard()
+    pasteboard.clearContents()
+
+    items: list[NSPasteboardItem] = []
+    for item_data in snapshot:
+        item = NSPasteboardItem.alloc().init()
+        for t_str, raw in item_data.items():
+            try:
+                data = NSData.dataWithBytes_length_(raw, len(raw))
+                item.setData_forType_(data, t_str)
+            except Exception:
+                continue
+        items.append(item)
+
+    if items:
+        pasteboard.writeObjects_(items)
+
+
+@contextlib.contextmanager
+def preserve_clipboard(*, restore_delay_s: float = 0.25):
+    """
+    Preserve the user's clipboard across a temporary pasteboard write.
+
+    Useful for apps like WPS on macOS that require clipboard-based rich-text paste.
+    """
+    snapshot: list[dict[str, bytes]] | None = None
+    try:
+        snapshot = _snapshot_pasteboard()
+        yield
+    finally:
+        if restore_delay_s > 0:
+            time.sleep(restore_delay_s)
+        if snapshot is not None:
+            try:
+                _restore_pasteboard(snapshot)
+            except Exception as exc:
+                log(f"Failed to restore clipboard: {exc}")
 
 
 def get_clipboard_text() -> str:

@@ -52,9 +52,6 @@ class WordPlacer(BaseDocumentPlacer):
         # todo move_cursor_to_end未实现
         # 将路径转换为 POSIX 格式
         posix_path = os.path.abspath(docx_path)
-        
-        # 将 Python bool 转换为 AppleScript bool 字符串
-        as_move_cursor = "true"
 
         script = f'''
         tell application "Microsoft Word"
@@ -63,25 +60,21 @@ class WordPlacer(BaseDocumentPlacer):
                 make new document
             end if
             
-            -- 修复点：不要 tell selection，而是在 Application 上下文操作
-            
-            -- 1. 获取当前选区的位置对象 (text object)
+            -- 如果当前有选区，先删除再插入（否则 insert file 会“插入”而不是“替换”）
+            try
+                set selRange to text object of selection
+                if (start of selRange) is not (end of selRange) then
+                    delete selRange
+                end if
+            on error
+                try
+                    delete selection
+                end try
+            end try
+
+            -- 在当前光标位置插入文件（插入后 selection 通常会选中新内容）
             set targetRange to text object of selection
-            
-            -- 2. 在该位置插入文件 (insert file 是 app 的命令，不是 selection 的)
-            -- 注意：Word AppleScript 这里的 file name 需要完整路径
             insert file at targetRange file name "{posix_path}"
-            
-            -- 3. 处理光标移动
-            if {as_move_cursor} then
-                -- 插入后，selection 通常会选中刚插入的内容
-                -- 我们再次获取当前的 selection 并将其折叠到末尾
-                set currentRange to text object of selection
-                collapse range currentRange direction collapse end
-                
-                -- 显式选中折叠后的点，确保光标视觉上跳过去
-                select currentRange
-            end if
         end tell
         '''
         
