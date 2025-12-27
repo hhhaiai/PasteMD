@@ -11,7 +11,7 @@ C:\Users\<用户名>\.pastemd\config.json
 
 ### macOS
 ```
-~/.pastemd/config.json
+~/Library/Application Support/PasteMD/config.json
 ```
 
 ## 快速访问
@@ -127,7 +127,7 @@ Windows 路径中的反斜杠需要转义（使用 `\\`）或使用正斜杠（`
 
 ---
 
-#### `reference_docx`
+#### `reference_docx` (一般不用)
 - **类型**：字符串 | null
 - **默认值**：`null`
 - **说明**：参考 DOCX 模板文件路径
@@ -213,14 +213,14 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 - **说明**：是否启用 Excel 表格自动粘贴功能
 
 **`true`**：检测到 Markdown 表格且前台应用是 Excel，自动转换为 Excel 格式
-**`false`**：所有内容统一转换为 Word 文档
+**`false`**：不启用 Excel 功能
 
 ---
 
 #### `excel_keep_format`
 - **类型**：布尔值
 - **默认值**：`true`
-- **说明**：Excel 粘贴时是否保留 Markdown 格式
+- **说明**：Excel 粘贴时是否有样式
 
 **保留的格式**（当为 `true` 时）：
 - **粗体**：`**text**` → 加粗单元格
@@ -238,16 +238,14 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 #### `md_disable_first_para_indent`
 - **类型**：布尔值
 - **默认值**：`true`
-- **说明**：Markdown 转换时，禁用首段缩进
-
-中文排版中，首段通常不缩进。设为 `true` 可以自动处理。
+- **说明**：Markdown 转换时，禁用第一段格式
 
 ---
 
 #### `html_disable_first_para_indent`
 - **类型**：布尔值
 - **默认值**：`true`
-- **说明**：HTML 转换时，禁用首段缩进
+- **说明**：HTML 转换时，禁用第一段格式
 
 ---
 
@@ -260,9 +258,9 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 ##### `strikethrough_to_del`
 - **类型**：布尔值
 - **默认值**：`true`
-- **说明**：将 `<s>` 标签转换为 `<del>` 标签
+- **说明**：将 `~~` 标签转换为 `<del>` 标签
 
-某些网站使用 `<s>` 表示删除线，但 Pandoc 更好地支持 `<del>`。
+某些网站使用 `~~` 不会在页面上渲染为删除线，而是显示为普通文本。启用此选项可确保删除线正确显示。
 
 **示例**：
 ```json
@@ -273,7 +271,7 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 
 ---
 
-#### `move_cursor_to_end`
+#### `move_cursor_to_end` (仅 Windows)
 - **类型**：布尔值
 - **默认值**：`true`
 - **说明**：插入内容后，将光标移到末尾
@@ -290,12 +288,8 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 - **默认值**：`false`
 - **说明**：保留原始 LaTeX 公式（不转换为 MathML）
 
-::: warning 实验性功能
-这是一个实验性功能，可能在某些情况下导致公式显示异常。
-:::
-
 **`false`**（默认）：公式转换为 Office MathML，完美显示
-**`true`**：公式保留为文本形式，保留 `$...$` 符号
+**`true`**：公式保留为文本形式，保留 `$...$` 符号，确保个性化使用
 
 **使用场景**：
 - 需要在 Word 中手动编辑公式
@@ -309,9 +303,7 @@ Pandoc 过滤器是用于扩展或修改转换行为的脚本（Lua、Python 等
 - **说明**：启用 LaTeX 语法兼容性修复
 
 自动修复 AI 网站输出的非标准 LaTeX 语法，例如：
-- `\kern` → `\qquad`（Word 不支持 `\kern`）
-- `\textrm` → `\mathrm`
-- 其他常见的兼容性问题
+- `\kern` → `\qquad`（pandoc 不支持 `\kern`）
 
 ---
 
@@ -366,101 +358,28 @@ $$
 
 ## 应用配置更改
 
-### 方法 1：通过托盘菜单
+### 通过修改配置文件
 
-1. 编辑配置文件（托盘菜单 → "编辑配置文件"）
-2. 保存更改
-3. 托盘菜单 → "重载配置"
+重启 PasteMD 应用
 
-### 方法 2：重启应用
+### 通过设置界面或托盘菜单
 
-编辑配置文件后，退出并重新启动 PasteMD。
-
-::: tip 热重载
-大部分配置项支持热重载，无需重启应用。但 `hotkey` 等少数配置项需要重启才能生效。
-:::
-
----
-
-## 配置建议
-
-### 推荐配置（日常使用）
-
-```json
-{
-  "hotkey": "<ctrl>+<shift>+b",
-  "notify": true,
-  "enable_excel": true,
-  "excel_keep_format": true,
-  "no_app_action": "open",
-  "keep_file": false,
-  "enable_latex_replacements": true,
-  "fix_single_dollar_block": true
-}
-```
-
-### 推荐配置（批量转换）
-
-```json
-{
-  "no_app_action": "save",
-  "keep_file": true,
-  "save_dir": "~/Desktop/converted",
-  "notify": false
-}
-```
-
-### 推荐配置（学术写作）
-
-```json
-{
-  "reference_docx": "~/Documents/thesis-template.docx",
-  "excel_keep_format": true,
-  "md_disable_first_para_indent": false,
-  "Keep_original_formula": false,
-  "enable_latex_replacements": true
-}
-```
-
----
+此方法会自动应用更改，无需重启。
 
 ## 故障排查
 
 ### 配置文件损坏
 
-如果配置文件格式错误，PasteMD 会：
-1. 显示错误通知
-2. 使用默认配置运行
-3. 在日志中记录详细错误
-
-**修复方法**：
-1. 查看日志（托盘菜单 → "查看日志"）
-2. 检查 JSON 语法（使用 [JSONLint](https://jsonlint.com/)）
-3. 或删除配置文件，重启 PasteMD 会自动创建默认配置
+1. 检查配置文件的 JSON 语法是否正确
+2. 恢复默认配置：
+    - 删除配置文件，应用会自动生成默认配置
 
 ### 配置不生效
 
-1. 确认配置文件已保存
-2. 重载配置（托盘菜单 → "重载配置"）
-3. 检查日志是否有错误信息
-4. 尝试重启应用
-
-### 重置为默认配置
-
-```bash
-# Windows
-del %USERPROFILE%\.pastemd\config.json
-
-# macOS
-rm ~/.pastemd/config.json
-```
-
-重启 PasteMD 会自动创建默认配置。
-
----
+1. 检查日志是否有错误信息
+2. 尝试重启应用
 
 ## 更多信息
 
 - [高级功能](/zh/guide/custom-filters) - 自定义 Pandoc 过滤器
-- [API 参考](/zh/api/) - 开发者文档
 - [GitHub](https://github.com/RichQAQ/PasteMD) - 源代码和问题反馈
