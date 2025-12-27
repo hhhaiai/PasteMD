@@ -1,0 +1,265 @@
+/**
+ * Customize default theme styling by overriding CSS variables:
+ * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+ */
+
+/**
+ * Colors: Light Blue Theme
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-c-brand-1: #5f9ea0;
+  --vp-c-brand-2: #4a8a8c;
+  --vp-c-brand-3: #3a7577;
+  --vp-c-brand-soft: rgba(95, 158, 160, 0.14);
+
+  --vp-c-brand-light: #7fb3b5;
+  --vp-c-brand-lighter: #9fc5c7;
+  --vp-c-brand-lightest: #bfd7d8;
+  --vp-c-brand-dark: #357375;
+  --vp-c-brand-darker: #2a5c5e;
+  --vp-c-brand-dimm: rgba(95, 158, 160, 0.08);
+}
+
+/**
+ * Component: Button
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: var(--vp-c-white);
+  --vp-button-brand-bg: var(--vp-c-brand-3);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: var(--vp-c-white);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: var(--vp-c-white);
+  --vp-button-brand-active-bg: var(--vp-c-brand-1);
+}
+
+/**
+ * Component: Home
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #5f9ea0 30%,
+    #41b883
+  );
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #5f9ea0 50%,
+    #47caff 50%
+  );
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/**
+ * Component: Custom Block
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-custom-block-tip-border: transparent;
+  --vp-custom-block-tip-text: var(--vp-c-text-1);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
+  --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+}
+
+/**
+ * Component: Algolia
+ * -------------------------------------------------------------------------- */
+
+.DocSearch {
+  --docsearch-primary-color: var(--vp-c-brand-1) !important;
+}
+
+/**
+ * Component: Code Group
+ * -------------------------------------------------------------------------- */
+
+.vp-code-group .tabs {
+  border-bottom-color: var(--vp-c-brand-soft);
+}
+
+.vp-code-group .tabs label {
+  color: var(--vp-c-text-2);
+}
+
+.vp-code-group .tabs label.active {
+  color: var(--vp-c-brand-1);
+  border-bottom-color: var(--vp-c-brand-1);
+}
+
+/**
+ * Custom: Feature Cards
+ * -------------------------------------------------------------------------- */
+
+.feature-card {
+  position: relative;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 8px 24px rgba(95, 158, 160, 0.12);
+  transform: translateY(-2px);
+}
+
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
+  color: white;
+  font-size: 24px;
+}
+
+/**
+ * Custom: Platform Badge
+ * -------------------------------------------------------------------------- */
+
+.platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+/**
+ * Custom: Info Card
+ * -------------------------------------------------------------------------- */
+
+.info-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  margin: 16px 0;
+  border-radius: 8px;
+  background-color: var(--vp-c-bg-soft);
+  border-left: 4px solid var(--vp-c-brand-1);
+}
+
+.info-card-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--vp-c-brand-1);
+}
+
+.info-card-content h4 {
+  margin: 0 0 8px 0;
+  color: var(--vp-c-brand-1);
+}
+
+.info-card-content p {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+/**
+ * Custom: Nav Bar GitHub Stars
+ * -------------------------------------------------------------------------- */
+
+.nav-bar-github-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.nav-bar-github-stars:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-text-1);
+}
+
+.nav-bar-github-stars-label {
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+}
+
+.nav-bar-github-stars-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--vp-c-text-1);
+}
+
+/**
+ * Custom: Feature Layout
+ * -------------------------------------------------------------------------- */
+
+.VPHome {
+  padding-bottom: 48px;
+}
+
+.VPFeature .box {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 8px;
+  align-items: center;
+}
+
+.VPFeature .icon {
+  margin: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 22px;
+}
+
+.VPFeature .box > .VPImage {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+
+.VPFeature .title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.VPFeature .details {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding-top: 0;
+}
