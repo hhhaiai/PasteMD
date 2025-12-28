@@ -169,7 +169,10 @@ const enConfig = {
         {
           text: 'macOS Guide',
           items: [
-            { text: 'Introduction', link: '/en/macos/' }
+            { text: 'Introduction', link: '/en/macos/' },
+            { text: 'Permissions', link: '/en/macos/permissions' },
+            { text: 'Troubleshooting', link: '/en/macos/troubleshooting' },
+            { text: 'WPS Formula Support', link: '/en/macos/wpslatex' }
           ]
         }
       ],
@@ -240,7 +243,7 @@ export default defineConfig({
 
   themeConfig: {
     logo: '/logo.png',
-    i18nRouting: false,
+    i18nRouting: true,
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/RichQAQ/PasteMD' }

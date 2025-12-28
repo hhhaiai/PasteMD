@@ -262,5 +262,7 @@ nuitka-crash-report.xml
 *.dmg
 
 docs/node_modules/
-docs/.vitepress/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+docs/.vitepress/*.zip
 *.bak
