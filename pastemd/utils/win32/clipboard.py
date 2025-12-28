@@ -195,6 +195,8 @@ def is_clipboard_empty() -> bool:
         True 如果剪贴板为空或只包含空白字符
     """
     try:
+        if is_clipboard_files():
+            return False
         text = get_clipboard_text()
         return not text or not text.strip()
     except ClipboardError:
