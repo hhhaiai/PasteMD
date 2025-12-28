@@ -83,7 +83,7 @@ const zhConfig = {
     },
 
     editLink: {
-      pattern: 'https://github.com/RichQAQ/PasteMD/edit/main/docs/:path',
+      pattern: 'https://github.com/RICHQAQ/PasteMD/blob/vitepress/docs/:path',
       text: '在 GitHub 上编辑此页'
     },
 
@@ -201,13 +201,13 @@ const enConfig = {
     },
 
     editLink: {
-      pattern: 'https://github.com/RichQAQ/PasteMD/edit/main/docs/:path',
+      pattern: 'https://github.com/RICHQAQ/PasteMD/blob/vitepress/docs/:path',
       text: 'Edit this page on GitHub'
     },
 
     footer: {
       message: 'Released under the MIT License',
-      copyright: 'Copyright © 2024-present RichQAQ'
+      copyright: 'Copyright © 2025-present RichQAQ'
     }
   }
 }
