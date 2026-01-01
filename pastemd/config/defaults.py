@@ -67,7 +67,6 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     },
     "move_cursor_to_end": True,
     "Keep_original_formula": False,
-    "language": "zh",
     "enable_latex_replacements": True,
     "fix_single_dollar_block": True,
     "pandoc_filters": [],
