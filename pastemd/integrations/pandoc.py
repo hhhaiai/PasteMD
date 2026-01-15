@@ -5,7 +5,7 @@ import re
 import subprocess
 from typing import Optional, List
 
-from ..utils.html_formatter import protect_task_list_brackets
+from ..utils.html_formatter import protect_brackets
 
 from ..config.paths import resource_path
 
@@ -13,11 +13,7 @@ from ..core.errors import PandocError
 from ..utils.logging import log
 
 LUA_KEEP_ORIGINAL_FORMULA = resource_path("lua/keep-latex-math.lua")
-if not os.path.isfile(LUA_KEEP_ORIGINAL_FORMULA):
-    LUA_KEEP_ORIGINAL_FORMULA = resource_path("pastemd/lua/keep-latex-math.lua")
 LUA_LATEX_REPLACEMENTS = resource_path("lua/latex-replacements.lua")
-if not os.path.isfile(LUA_LATEX_REPLACEMENTS):
-    LUA_LATEX_REPLACEMENTS = resource_path("pastemd/lua/latex-replacements.lua")
 
 
 def _log_pandoc_stderr_as_warning(stderr: Optional[bytes], *, context: str) -> None:
@@ -120,14 +116,14 @@ class PandocIntegration:
         """
         使用 Pandoc 将 HTML 转换为 Markdown。
         """
-        html_text = protect_task_list_brackets(html_text)
+        html_text = protect_brackets(html_text)
         cmd = [
             self.pandoc_path,
             "-f", "html+tex_math_dollars+raw_tex+tex_math_double_backslash+tex_math_single_backslash",
             "-t", "gfm-raw_html+tex_math_dollars",
             "-o", "-",          # 输出到 stdout
             "--wrap", "none",   # 不自动换行，方便你后处理
-        ]
+        ]   
 
         startupinfo = None
         creationflags = 0

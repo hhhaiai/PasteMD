@@ -253,9 +253,8 @@ def set_clipboard_rich_text(
         if html is not None:
             html_data = NSData.dataWithBytes_length_(html.encode("utf-8"), len(html.encode("utf-8")))
             item.setData_forType_(html_data, NSPasteboardTypeHTML)
-            item.setString_forType_(html, "Apple HTML pasteboard type")
             item.setString_forType_(html, HTML_UTI)
-            log(f"set HTML type={NSPasteboardTypeHTML},Apple HTML pasteboard type,{HTML_UTI} len={len(html.encode('utf-8'))}")
+            log(f"set HTML type={NSPasteboardTypeHTML},{HTML_UTI} len={len(html.encode('utf-8'))}")
 
         # 4) Plain（兜底）
         if text is not None:

@@ -98,6 +98,30 @@ def _clean_latex_br_tags(soup) -> None:
             # 删除 <br> 标签
             br.replace_with('')
 
+    # 处理 $$ ... $$ 包裹的内容
+    # 遍历可能的容器元素
+    for tag in soup.find_all(['p', 'div', 'span', 'li', 'td', 'th']):
+        # 快速检查：容器内必须有 br 且文本包含 $$
+        if not tag.find('br', recursive=False) or '$$' not in tag.get_text():
+            continue
+
+        in_latex = False
+        # 使用 list 复制 children，因为我们会修改 DOM (删除 br)
+        for child in list(tag.children):
+            if isinstance(child, NavigableString):
+                # 统计文本中 $$ 的数量，如果是奇数个，说明状态切换
+                if str(child).count('$$') % 2 == 1:
+                    in_latex = not in_latex
+            elif child.name == 'br':
+                # 如果在公式内，移除 br
+                if in_latex:
+                    child.decompose()
+            elif hasattr(child, 'get_text'):
+                # 对于其他标签，检查其文本内容是否包含 $$ 导致状态切换
+                # 假设 $$ 成对出现，若子元素包含奇数个 $$，则改变当前上下文状态
+                if child.get_text().count('$$') % 2 == 1:
+                    in_latex = not in_latex
+
 
 def unwrap_all_p_div_inside_li(soup, unwrap_tags=("p", "div")) -> None:
     """
@@ -432,9 +456,9 @@ def clean_html_for_wps(html: str) -> str:
     return str(soup)
 
 
-def protect_task_list_brackets(html: str) -> str:
+def protect_brackets(html: str) -> str:
     """
-    保护 HTML 中的任务列表标记，避免被 Pandoc 转义和误识别。
+    保护 HTML 中的任务列表，$$等数学公式，避免被 Pandoc 转义和误识别。
     
     将 [x] 和 [ ] 替换为特殊标记：
     - [x] -> {{TASK_CHECKED}}
