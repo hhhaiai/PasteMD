@@ -10,7 +10,7 @@ from ...i18n import t
 from .word import WordWorkflow, WPSWorkflow
 from .excel import ExcelWorkflow, WPSExcelWorkflow
 from .fallback import FallbackWorkflow
-from .extensible import HtmlWorkflow, MdWorkflow
+from .extensible import HtmlWorkflow, MdWorkflow, LatexWorkflow
 
 
 class WorkflowRouter:
@@ -40,6 +40,7 @@ class WorkflowRouter:
         self.extensible_registry = {
             "html": HtmlWorkflow(),
             "md": MdWorkflow(),
+            "latex": LatexWorkflow(),
         }
         
         self.notification_manager = NotificationManager()

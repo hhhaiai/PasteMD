@@ -244,3 +244,32 @@ class DocumentGenerator:
             request_headers=request_headers,
             cwd=config.get("save_dir"),
         )
+
+    def convert_html_to_latex_text(self, html_text: str, config: dict) -> str:
+        """
+        将 HTML 文本转换为 LaTeX 文本（用于 Overleaf 粘贴）。
+        
+        Returns:
+            去除文档头部的 LaTeX 内容，可直接粘贴到 Overleaf
+        """
+        self._ensure_pandoc_integration()
+        return self._pandoc_integration.convert_html_to_latex_text(  # type: ignore[union-attr]
+            html_text,
+            strip_preamble=True,
+        )
+
+    def convert_markdown_to_latex_text(self, md_text: str, config: dict) -> str:
+        """
+        将 Markdown 文本转换为 LaTeX 文本（用于 Overleaf 粘贴）。
+        
+        Returns:
+            去除文档头部的 LaTeX 内容，可直接粘贴到 Overleaf
+        """
+        self._ensure_pandoc_integration()
+        return self._pandoc_integration.convert_markdown_to_latex_text(  # type: ignore[union-attr]
+            md_text,
+            strip_preamble=True,
+            enable_latex_replacements=config.get("enable_latex_replacements", True),
+            custom_filters=config.get("pandoc_filters", []),
+        )
+

@@ -429,7 +429,7 @@ class ExtensionsTab:
         """创建 UI 组件"""
         ext_config = self.config.get("extensible_workflows", {})
         
-        # 内部 Notebook 用于切换 HTML / MD 工作流
+        # 内部 Notebook 用于切换 HTML / MD / LaTeX 工作流
         self.inner_notebook = ttk.Notebook(self.frame)
         self.inner_notebook.pack(fill=tk.BOTH, expand=True)
         
@@ -459,6 +459,19 @@ class ExtensionsTab:
             text=t("settings.extensions.md_title")
         )
         
+        # LaTeX 工作流配置
+        self.latex_section = WorkflowSection(
+            self.inner_notebook,
+            workflow_key="latex",
+            enable_key="settings.extensions.latex_enable",
+            config=ext_config.get("latex", {}),
+            has_keep_latex=False,
+        )
+        self.inner_notebook.add(
+            self.latex_section.frame, 
+            text=t("settings.extensions.latex_title")
+        )
+        
         # 说明文字
         ttk.Label(
             self.frame,
@@ -472,4 +485,7 @@ class ExtensionsTab:
         return {
             "html": self.html_section.get_config(),
             "md": self.md_section.get_config(),
+            "latex": self.latex_section.get_config(),
         }
+
+

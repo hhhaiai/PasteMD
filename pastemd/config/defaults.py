@@ -92,6 +92,11 @@ DEFAULT_CONFIG: Dict[str, Any] = {
             "enabled": True,  # 默认开启
             "apps": [],
         },
+        "latex": {
+            "enabled": True,  # 默认开启
+            "apps": [],
+        },
     },
 }
+
 
