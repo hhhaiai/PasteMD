@@ -44,6 +44,7 @@ class ClipboardHTMLSpreadsheetPlacer(BaseSpreadsheetPlacer):
     def place(self, table_data: List[List[str]], config: dict) -> PlacementResult:
         try:
             keep_format = config.get("excel_keep_format", config.get("keep_format", True))
+            paste_delay_s = config.get("paste_delay_s", 0.3)
             
             # 使用共享的 HTML 和 TSV 转换工具
             html_text = table_to_html(table_data, keep_format=keep_format)
@@ -52,7 +53,7 @@ class ClipboardHTMLSpreadsheetPlacer(BaseSpreadsheetPlacer):
             # Excel/WPS 可以处理 HTML table；Plain TSV 作为兜底
             with preserve_clipboard():
                 set_clipboard_rich_text(html=html_text, text=tsv_text)
-                time.sleep(0.3)
+                time.sleep(paste_delay_s)
                 simulate_paste()
 
             return PlacementResult(

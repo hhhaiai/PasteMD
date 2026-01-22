@@ -159,6 +159,8 @@
     "settings.conversion.pandoc_request_headers_fill_example": "Fill example",
     "settings.advanced.excel_enable": "Enable Excel smart paste",
     "settings.advanced.excel_format": "Excel paste preserve formatting",
+    "settings.advanced.paste_delay": "Paste delay (seconds)",
+    "settings.advanced.paste_delay_note": "Delay after updating clipboard before simulating paste.",
     "settings.buttons.save": "Save",
     "settings.buttons.cancel": "Cancel",
     "settings.success.saved": "Settings saved successfully",

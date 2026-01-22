@@ -159,6 +159,8 @@
     "settings.conversion.pandoc_request_headers_fill_example": "填入示例",
     "settings.advanced.excel_enable": "启用 Excel 智能粘贴",
     "settings.advanced.excel_format": "Excel 粘贴保留格式",
+    "settings.advanced.paste_delay": "粘贴延迟（秒）",
+    "settings.advanced.paste_delay_note": "写入剪贴板后等待的时间，再模拟粘贴。",
     "settings.buttons.save": "保存",
     "settings.buttons.cancel": "取消",
     "settings.success.saved": "设置已保存",

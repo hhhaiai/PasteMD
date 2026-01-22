@@ -389,6 +389,7 @@ class SettingsDialog:
         frame = ttk.Frame(self.notebook, padding=10)
         self.notebook.add(frame, text=t("settings.tab.advanced"))
         self._tab_map["advanced"] = frame
+        frame.columnconfigure(1, weight=1)
         
         # Excel 选项
         self.excel_enable_var = tk.BooleanVar(value=self.current_config.get("enable_excel", True))
@@ -396,6 +397,19 @@ class SettingsDialog:
         
         self.excel_format_var = tk.BooleanVar(value=self.current_config.get("excel_keep_format", True))
         ttk.Checkbutton(frame, text=t("settings.advanced.excel_format"), variable=self.excel_format_var).grid(row=1, column=0, sticky=tk.W, pady=5)
+
+        # 粘贴延迟
+        ttk.Label(frame, text=t("settings.advanced.paste_delay")).grid(row=2, column=0, sticky=tk.W, pady=(10, 5))
+        self.paste_delay_var = tk.StringVar(value=str(self.current_config.get("paste_delay_s", 0.3)))
+        paste_delay_entry = ttk.Entry(frame, textvariable=self.paste_delay_var, width=10)
+        paste_delay_entry.grid(row=2, column=1, sticky=tk.W, padx=5, pady=(10, 5))
+        paste_delay_entry.bind("<FocusIn>", self._on_focus_in)
+        ttk.Label(
+            frame,
+            text=t("settings.advanced.paste_delay_note"),
+            foreground="gray",
+            font=("", 8),
+        ).grid(row=3, column=0, columnspan=2, sticky=tk.W, padx=(0, 5), pady=(0, 5))
 
     def _create_experimental_tab(self):
         """创建实验性功能选项卡"""
@@ -639,6 +653,13 @@ class SettingsDialog:
             
             new_config["enable_excel"] = self.excel_enable_var.get()
             new_config["excel_keep_format"] = self.excel_format_var.get()
+            try:
+                paste_delay_value = float(self.paste_delay_var.get())
+                if paste_delay_value < 0:
+                    paste_delay_value = 0.0
+            except (TypeError, ValueError):
+                paste_delay_value = DEFAULT_CONFIG.get("paste_delay_s", 0.3)
+            new_config["paste_delay_s"] = paste_delay_value
             
             # 保存 Pandoc Filters 列表
             new_config["pandoc_filters"] = self.filters_list

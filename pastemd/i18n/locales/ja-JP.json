@@ -159,6 +159,8 @@
     "settings.conversion.pandoc_request_headers_fill_example": "例を挿入",
     "settings.advanced.excel_enable": "Excel スマート貼り付けを有効化",
     "settings.advanced.excel_format": "Excel 貼り付けで書式を保持",
+    "settings.advanced.paste_delay": "貼り付け遅延（秒）",
+    "settings.advanced.paste_delay_note": "クリップボード更新後に待機してから貼り付けを実行します。",
     "settings.buttons.save": "保存",
     "settings.buttons.cancel": "キャンセル",
     "settings.success.saved": "設定を保存しました",

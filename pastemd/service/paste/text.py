@@ -28,9 +28,10 @@ class PlainTextPastePlacer(BasePastePlacer):
             PlacementResult: 落地结果
         """
         try:
+            paste_delay_s = config.get("paste_delay_s", 0.3)
             with preserve_clipboard():
                 set_clipboard_text(content)
-                time.sleep(0.1)
+                time.sleep(paste_delay_s)
                 simulate_paste()
 
             return PlacementResult(
