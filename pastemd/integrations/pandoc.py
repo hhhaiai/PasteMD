@@ -112,7 +112,11 @@ class PandocIntegration:
         
         return filter_args
 
-    def _convert_html_to_md(self, html_text: str) -> str:
+    def _convert_html_to_md(
+        self,
+        html_text: str,
+        custom_filters: Optional[List[str]] = None,
+    ) -> str:
         """
         使用 Pandoc 将 HTML 转换为 Markdown。
         """
@@ -123,7 +127,8 @@ class PandocIntegration:
             "-t", "gfm-raw_html+tex_math_dollars",
             "-o", "-",          # 输出到 stdout
             "--wrap", "none",   # 不自动换行，方便你后处理
-        ]   
+        ]
+        cmd += self._build_filter_args(custom_filters)
 
         startupinfo = None
         creationflags = 0
@@ -158,11 +163,16 @@ class PandocIntegration:
         md = md.replace("{{TASK_CHECKED}}", "[x]").replace("{{TASK_UNCHECKED}}", "[ ]")
         return md
 
-    def convert_html_to_markdown_text(self, html_text: str) -> str:
+    def convert_html_to_markdown_text(
+        self,
+        html_text: str,
+        *,
+        custom_filters: Optional[List[str]] = None,
+    ) -> str:
         """
         将 HTML 转换为 Markdown 文本（保留 $...$ 数学语法）。
         """
-        return self._convert_html_to_md(html_text)
+        return self._convert_html_to_md(html_text, custom_filters)
 
     def convert_markdown_to_html_text(
         self,
@@ -343,7 +353,18 @@ class PandocIntegration:
         _log_pandoc_stderr_as_warning(result.stderr, context="Pandoc warning (MD->DOCX)")
         return result.stdout
 
-    def convert_html_to_docx_bytes(self, html_text: str, reference_docx: Optional[str] = None, Keep_original_formula: bool = False, enable_latex_replacements: bool = True, custom_filters: Optional[List[str]] = None, request_headers: Optional[List[str]] = None, cwd: Optional[str] = None) -> bytes:
+    def convert_html_to_docx_bytes(
+        self,
+        html_text: str,
+        reference_docx: Optional[str] = None,
+        Keep_original_formula: bool = False,
+        enable_latex_replacements: bool = True,
+        custom_filters: Optional[List[str]] = None,
+        request_headers: Optional[List[str]] = None,
+        cwd: Optional[str] = None,
+        custom_filters_html_to_md: Optional[List[str]] = None,
+        custom_filters_md_to_docx: Optional[List[str]] = None,
+    ) -> bytes:
         """
         用 stdin 喂入 HTML，直接把 DOCX 从 stdout 读到内存（无任何输入文件写盘）
         
@@ -362,13 +383,13 @@ class PandocIntegration:
             PandocError: 转换失败时
         """
         if Keep_original_formula:
-            md = self._convert_html_to_md(html_text)
+            md = self._convert_html_to_md(html_text, custom_filters_html_to_md)
             return self.convert_to_docx_bytes(
                     md_text=md,
                     reference_docx=reference_docx,
                     Keep_original_formula=Keep_original_formula,
                     enable_latex_replacements=enable_latex_replacements,
-                    custom_filters=custom_filters,
+                    custom_filters=custom_filters_md_to_docx or custom_filters,
                     request_headers=request_headers,
                     cwd=cwd,
                 )
@@ -471,10 +492,12 @@ class PandocIntegration:
         return result
 
     def convert_html_to_latex_text(
-        self, 
-        html_text: str, 
-        *, 
-        strip_preamble: bool = True
+        self,
+        html_text: str,
+        *,
+        strip_preamble: bool = True,
+        custom_filters_html_to_md: Optional[List[str]] = None,
+        custom_filters_md_to_latex: Optional[List[str]] = None,
     ) -> str:
         """
         Convert HTML to LaTeX text.
@@ -487,9 +510,13 @@ class PandocIntegration:
             LaTeX content (body only if strip_preamble=True)
         """
         # First convert HTML to Markdown
-        md_text = self._convert_html_to_md(html_text)
+        md_text = self._convert_html_to_md(html_text, custom_filters_html_to_md)
         # Then convert Markdown to LaTeX
-        return self.convert_markdown_to_latex_text(md_text, strip_preamble=strip_preamble)
+        return self.convert_markdown_to_latex_text(
+            md_text,
+            strip_preamble=strip_preamble,
+            custom_filters=custom_filters_md_to_latex,
+        )
 
     def convert_markdown_to_latex_text(
         self,
@@ -549,4 +576,3 @@ class PandocIntegration:
             latex = self._strip_latex_preamble(latex)
         
         return latex
-

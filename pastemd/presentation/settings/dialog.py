@@ -49,16 +49,54 @@ class SettingsDialog:
         # 加载当前配置的副本，避免直接修改 app_state
         self.current_config = copy.deepcopy(app_state.config)
         
-        # 初始化 Filter 列表
-        raw_filters = self.current_config.get("pandoc_filters") or []
-        if isinstance(raw_filters, str):
-            raw_filters = [raw_filters]
-        elif not isinstance(raw_filters, (list, tuple)):
-            raw_filters = []
-        self.filters_list = [
-            f for f in raw_filters
+        self._conversion_filter_keys = [
+            "md_to_docx",
+            "html_to_docx",
+            "html_to_md",
+            "md_to_html",
+            "md_to_rtf",
+            "md_to_latex",
+        ]
+        self.filter_conversion_options = [
+            ("global", t("settings.conversion.filter_conversion_global")),
+            ("md_to_docx", t("settings.conversion.filter_conversion_md_to_docx")),
+            ("html_to_docx", t("settings.conversion.filter_conversion_html_to_docx")),
+            ("html_to_md", t("settings.conversion.filter_conversion_html_to_md")),
+            ("md_to_html", t("settings.conversion.filter_conversion_md_to_html")),
+            ("md_to_rtf", t("settings.conversion.filter_conversion_md_to_rtf")),
+            ("md_to_latex", t("settings.conversion.filter_conversion_md_to_latex")),
+        ]
+        self._filter_conversion_label_to_key = {
+            label: key for key, label in self.filter_conversion_options
+        }
+
+        raw_filters_by_conversion = self.current_config.get("pandoc_filters_by_conversion")
+        if not isinstance(raw_filters_by_conversion, dict):
+            raw_filters_by_conversion = {}
+
+        raw_global_filters = self.current_config.get("pandoc_filters") or []
+        if isinstance(raw_global_filters, str):
+            raw_global_filters = [raw_global_filters]
+        elif not isinstance(raw_global_filters, (list, tuple)):
+            raw_global_filters = []
+        raw_global_filters = [
+            f for f in raw_global_filters
             if isinstance(f, str) and f.strip()
         ]
+        self.global_filters = list(raw_global_filters)
+
+        self.filters_by_conversion: Dict[str, list[str]] = {}
+        for key in self._conversion_filter_keys:
+            raw_list = raw_filters_by_conversion.get(key, [])
+            if isinstance(raw_list, str):
+                raw_list = [raw_list]
+            elif not isinstance(raw_list, (list, tuple)):
+                raw_list = []
+            normalized = [f for f in raw_list if isinstance(f, str) and f.strip()]
+            self.filters_by_conversion[key] = normalized
+
+        default_label = self.filter_conversion_options[0][1]
+        self.filter_conversion_var = tk.StringVar(value=default_label)
         
         if app_state.root:
             self.root = tk.Toplevel(app_state.root)
@@ -662,7 +700,11 @@ class SettingsDialog:
             new_config["paste_delay_s"] = paste_delay_value
             
             # 保存 Pandoc Filters 列表
-            new_config["pandoc_filters"] = self.filters_list
+            new_config["pandoc_filters_by_conversion"] = {
+                key: list(self.filters_by_conversion.get(key, []))
+                for key in self._conversion_filter_keys
+            }
+            new_config["pandoc_filters"] = list(self.global_filters)
             
             # 保存扩展选项卡配置
             if self._extensions_tab:
@@ -823,6 +865,25 @@ class SettingsDialog:
         link2 = self._create_hyperlink_label(link_frame, link2_text, link2_url)
         link2.pack(side=tk.LEFT)
 
+        # 转换类型选择
+        conversion_frame = ttk.Frame(frame)
+        conversion_frame.grid(row=row+2, column=0, columnspan=3, sticky=tk.W, padx=(0, 5), pady=(0, 5))
+        ttk.Label(conversion_frame, text=t("settings.conversion.filter_conversion_label")).pack(
+            side=tk.LEFT
+        )
+        conversion_labels = [label for _, label in self.filter_conversion_options]
+        self.filter_conversion_combo = ttk.Combobox(
+            conversion_frame,
+            textvariable=self.filter_conversion_var,
+            values=conversion_labels,
+            state="readonly",
+            width=22,
+        )
+        self.filter_conversion_combo.pack(side=tk.LEFT, padx=(6, 0))
+        self.filter_conversion_combo.bind(
+            "<<ComboboxSelected>>", lambda e: self._on_filter_conversion_changed()
+        )
+
         # 列表框
         self.filters_listbox = tk.Listbox(
             frame, 
@@ -830,11 +891,11 @@ class SettingsDialog:
             selectmode=tk.SINGLE,
             activestyle="none"
         )
-        self.filters_listbox.grid(row=row+2, column=0, columnspan=2, sticky=tk.NSEW, padx=(0, 5), pady=5)
+        self.filters_listbox.grid(row=row+3, column=0, columnspan=2, sticky=tk.NSEW, padx=(0, 5), pady=5)
         
         # 按钮组
         button_frame = ttk.Frame(frame)
-        button_frame.grid(row=row+2, column=2, sticky=tk.N, pady=5)
+        button_frame.grid(row=row+3, column=2, sticky=tk.N, pady=5)
         
         # 按钮宽度统一
         btn_width = 8
@@ -878,7 +939,7 @@ class SettingsDialog:
             foreground="gray",
             font=("", 8)
         )
-        note_label.grid(row=row+3, column=0, columnspan=3, sticky=tk.W, padx=(0, 5), pady=(0, 8))
+        note_label.grid(row=row+4, column=0, columnspan=3, sticky=tk.W, padx=(0, 5), pady=(0, 8))
         
         # 绑定列表框选择事件
         self.filters_listbox.bind("<<ListboxSelect>>", lambda e: self._update_filter_buttons_state())
@@ -893,7 +954,7 @@ class SettingsDialog:
         self._update_filter_buttons_state()
         
         # 返回下一个可用行号
-        return row + 4
+        return row + 5
 
     def _create_hyperlink_label(self, parent: tk.Widget, text: str, url: str) -> ttk.Label:
         """创建可点击的超链接标签"""
@@ -909,6 +970,17 @@ class SettingsDialog:
         link.bind("<Button-1>", lambda e: webbrowser.open(url))
         
         return link
+
+    def _get_current_filters(self) -> list[str]:
+        label = self.filter_conversion_var.get()
+        key = self._filter_conversion_label_to_key.get(label, "global")
+        if key == "global":
+            return self.global_filters
+        return self.filters_by_conversion.setdefault(key, [])
+
+    def _on_filter_conversion_changed(self):
+        self._refresh_filters_listbox()
+        self._update_filter_buttons_state()
 
     def _on_add_filter(self):
         """处理添加 Filter 的操作"""
@@ -927,8 +999,8 @@ class SettingsDialog:
         
         # 用户是否选择文件
         if path:
-            # 将路径添加到 filters_list
-            self.filters_list.append(path)
+            # 将路径添加到当前转换类型列表
+            self._get_current_filters().append(path)
             
             # 刷新列表框显示
             self._refresh_filters_listbox()
@@ -947,8 +1019,8 @@ class SettingsDialog:
             
         index = selection[0]
         
-        # 从 filters_list 中删除对应项
-        self.filters_list.pop(index)
+        # 从当前转换类型列表中删除对应项
+        self._get_current_filters().pop(index)
         
         # 刷新列表框显示
         self._refresh_filters_listbox()
@@ -968,10 +1040,11 @@ class SettingsDialog:
         index = selection[0]
         
         # 检查有效性
+        current_list = self._get_current_filters()
         if index > 0:
             # 交换位置
-            self.filters_list[index], self.filters_list[index-1] = \
-                self.filters_list[index-1], self.filters_list[index]
+            current_list[index], current_list[index-1] = \
+                current_list[index-1], current_list[index]
             
             # 刷新显示
             self._refresh_filters_listbox()
@@ -994,10 +1067,11 @@ class SettingsDialog:
         index = selection[0]
         
         # 检查有效性
-        if index < len(self.filters_list) - 1:
+        current_list = self._get_current_filters()
+        if index < len(current_list) - 1:
             # 交换位置
-            self.filters_list[index], self.filters_list[index+1] = \
-                self.filters_list[index+1], self.filters_list[index]
+            current_list[index], current_list[index+1] = \
+                current_list[index+1], current_list[index]
             
             # 刷新显示
             self._refresh_filters_listbox()
@@ -1016,10 +1090,11 @@ class SettingsDialog:
         # 判断是否有选中
         has_selection = bool(selection)
         
+        current_list = self._get_current_filters()
         if has_selection:
             index = selection[0]
             is_first = (index == 0)
-            is_last = (index == len(self.filters_list) - 1)
+            is_last = (index == len(current_list) - 1)
             
             # 设置按钮状态
             self.remove_filter_btn.config(state=tk.NORMAL)
@@ -1037,8 +1112,8 @@ class SettingsDialog:
             # 清空列表框
             self.filters_listbox.delete(0, tk.END)
             
-            # 遍历 filters_list，显示完整路径
-            for path in self.filters_list:
+            # 遍历当前转换类型列表，显示完整路径
+            for path in self._get_current_filters():
                 self.filters_listbox.insert(tk.END, path)
         except Exception as e:
             log(f"Failed to refresh filters listbox: {e}")
@@ -1053,7 +1128,8 @@ class SettingsDialog:
             return
             
         index = selection[0]
-        current_path = self.filters_list[index]
+        current_list = self._get_current_filters()
+        current_path = current_list[index]
         
         # 创建编辑对话框
         edit_dialog = tk.Toplevel(self.root)
@@ -1089,7 +1165,7 @@ class SettingsDialog:
             """保存编辑"""
             new_path = path_var.get().strip()
             if new_path:
-                self.filters_list[index] = new_path
+                current_list[index] = new_path
                 self._refresh_filters_listbox()
                 # 恢复选中
                 self.filters_listbox.selection_set(index)
