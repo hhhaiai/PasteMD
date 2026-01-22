@@ -31,7 +31,16 @@
      alt="I am good"
      width="100">
 
-PasteMD is a lightweight tray app that watches your clipboard, converts Markdown or HTML-rich text to DOCX through Pandoc, and pastes the result straight into the caret position of Word or WPS. It understands Markdown tables and can paste them directly into Excel with formatting preserved, and it recognizes HTML rich text (except math) copied from web pages.
+A lightweight tray app:
+Reads **Markdown from the clipboard**, converts it to DOCX with **Pandoc**, and inserts it at the caret position in **Word/WPS**.
+
+**✨ Feature**: Smart Markdown table detection, one-click paste to **Excel**!
+
+**✨ Feature**: Smart HTML rich text detection, easy one-click paste of AI replies from the web into **Word/WPS**!
+
+**✨ New feature**: App extensions (HTML+Markdown/HTML/Markdown/LaTeX/File paste), match by app/window title (e.g., Yuque/QQ).
+
+**✨ New feature**: Conversion enhancements: configure Pandoc Filters by conversion type; auto-fix some LaTeX syntax and standalone `$...$` formula blocks.
 
 ---
 
@@ -60,63 +69,69 @@ PasteMD is a lightweight tray app that watches your clipboard, converts Markdown
   <img src="../../docs/gif/demo-chage_format.gif" alt="Formatting demo" width="600">
 </p>
 
-### Workflow Boosters
 
-- Global hotkey (default `Ctrl+Shift+B`) to paste the latest Markdown/HTML clipboard snapshot as DOCX.
-- Automatically recognizes Markdown tables, converts them to spreadsheets, and pastes into Excel while keeping bold/italic/code formats.
-- Recognizes HTML rich text copied from web pages and converts/pastes into Word/WPS.
-- Detects the foreground target app (Word, WPS, or Excel) and opens the correct program when needed.
-- Tray menu for toggling features, viewing logs, reloading config, and checking for updates.
-- Optional toast notifications and background logging for every conversion.
+* Global hotkey (default `Ctrl+Shift+B`) to paste Markdown → DOCX with one key.
+* **✨ Smart Markdown table detection** and paste into Excel.
+* **✨ App extensions**: configure HTML+Markdown/HTML/Markdown/LaTeX/File paste modes per app, with window-title matching.
+* **✨ Conversion enhancements**: add Pandoc Filters by conversion type, auto-fix some LaTeX syntax and standalone `$...$` formula blocks.
+* Auto-detect the active app: Word or WPS.
+* Smartly open the required app (Word/Excel).
+* Tray menu: keep files, view logs/config, etc.
+* System notifications.
+* No console window, non-blocking, stable.
 
 ---
 
-## AI Website Compatibility
+## 📊 AI Website Compatibility
 
-The following table summarizes how well popular AI chat sites work with PasteMD when copying Markdown or direct HTML content.
+The following table summarizes compatibility when copying content from major AI chat sites:
 
 | AI Service | Copy Markdown (no formulas) | Copy Markdown (with formulas) | Copy page content (no formulas) | Copy page content (with formulas) |
-|------------|----------------------------|-------------------------------|---------------------------------|-----------------------------------|
-| Kimi | ✅ Perfect | ✅ Perfect | ✅ Perfect | ⚠️ Formulas missing |
-| DeepSeek | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
-| Tongyi Qianwen | ✅ Perfect | ✅ Perfect | ✅ Perfect | ⚠️ Formulas missing |
-| Doubao* | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
-| ChatGLM/Zhipu | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
-| ChatGPT | ✅ Perfect | ⚠️ Rendered as code | ✅ Perfect | ✅ Perfect |
-| Gemini | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
-| Grok | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
-| Claude | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+|---------|:----------------------------:|:----------------------------:|:---------------------------:|:---------------------------:|
+| **Kimi** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ⚠️ Formulas missing |
+| **DeepSeek** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+| **Tongyi Qianwen** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ⚠️ Formulas missing |
+| **Doubao\*** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+| **Zhipu Qingyan<br/>/ChatGLM** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+| **ChatGPT** | ✅ Perfect | ⚠️ Rendered as code | ✅ Perfect | ✅ Perfect |
+| **Gemini** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+| **Grok** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
+| **Claude** | ✅ Perfect | ✅ Perfect | ✅ Perfect | ✅ Perfect |
 
-_*Doubao requires granting clipboard read permissions in the browser before copying HTML content with formulas (set it via the lock icon near the URL bar)._
+**Legend:**
+- ✅ **Perfect**: formatting, style, and formulas are displayed correctly
+- ⚠️ **Rendered as code**: formulas appear as LaTeX code; use Word/WPS equation editor to fix
+- ⚠️ **Formulas missing**: formulas are removed; re-enter them with the equation editor
+- **Doubao**: before copying web content (with formulas), enable “Allow clipboard read” in the browser (via the icon left of the URL)
 
-Legend:
-- ✅ **Perfect** — formatting, styles, and formulas are kept as-is.
-- ⚠️ **Rendered as code** — math formulas appear as raw LaTeX and must be rebuilt inside Word/WPS.
-- ⚠️ **Formulas missing** — math formulas are removed; rebuild them manually with the equation editor.
-
-Test description:
-1. **Copy Markdown** — use the “Copy” button provided beneath most AI responses (typically Markdown, sometimes HTML).
-2. **Copy page content** — manually select the AI reply and copy (HTML rich text).
+**Test method:**
+1. **Copy Markdown**: click the “Copy” button in an AI reply (usually Markdown, some sites include HTML)
+2. **Copy page content**: select the AI reply content directly and copy (HTML rich text)
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 1. Download an executable from the [Releases page](https://github.com/RICHQAQ/PasteMD/releases/):
-   - ~~**PasteMD_vx.x.x.exe** — portable build, requires Pandoc to be installed and accessible from `PATH`.~~ (no longer provided; please build from source if needed)
-   - **PasteMD_pandoc-Setup.exe** — bundled installer that ships with Pandoc and works out of the box.
-2. Open Word, WPS, or Excel and place the caret where you want to paste.
-3. Copy Markdown or HTML-rich text, then press the global hotkey (`Ctrl+Shift+B` by default).
-4. PasteMD will:
-   - Send Markdown tables to Excel (when Excel is already open).
-   - Convert regular Markdown/HTML to DOCX and insert it into Word/WPS.
-5. A notification in the tray (and optional toast) confirms success or failure.
+
+   * ~~**PasteMD_vx.x.x.exe** — **portable build**; requires Pandoc installed and available in command line. If not installed, download from the [Pandoc website](https://pandoc.org/installing.html).~~ (No longer provided. Build from source if needed.)
+   * **PasteMD_pandoc-Setup.exe** — **all-in-one installer** bundled with Pandoc.
+
+2. Open Word, WPS, or Excel and place the caret where you want to insert.
+
+3. Copy **Markdown** or **web content** into the clipboard, then press **Ctrl+Shift+B**.
+
+4. The result will be inserted automatically:
+   - **Markdown tables** → paste into Excel automatically (if Excel is open)
+   - **Regular Markdown/web content** → convert to DOCX and insert into Word/WPS
+
+5. A success/failure notification appears at the bottom right.
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
-The first launch creates a `config.json` file in the user data directory (Windows: `%APPDATA%\\PasteMD\\config.json`， MacOS: `~/Library/Application Support/PasteMD/config.json`). Edit it directly, then use the tray menu item **“Reload config/hotkey”** to apply changes instantly.
+The first run creates `config.json` in the user data directory (Windows: `%APPDATA%\\PasteMD\\config.json`, MacOS: `~/Library/Application Support/PasteMD/config.json`). You can edit it manually:
 
 ```json
 {
@@ -126,8 +141,10 @@ The first launch creates a `config.json` file in the user data directory (Window
   "save_dir": "%USERPROFILE%\\Documents\\pastemd",
   "keep_file": false,
   "notify": true,
+  "startup_notify": true,
   "enable_excel": true,
   "excel_keep_format": true,
+  "paste_delay_s": 0.3,
   "no_app_action": "open",
   "md_disable_first_para_indent": true,
   "html_disable_first_para_indent": true,
@@ -136,33 +153,75 @@ The first launch creates a `config.json` file in the user data directory (Window
   },
   "move_cursor_to_end": true,
   "Keep_original_formula": false,
+  "enable_latex_replacements": true,
+  "fix_single_dollar_block": true,
   "language": "zh-CN",
   "pandoc_request_headers": [
     "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
   ],
-  "pandoc_filters": []
+  "pandoc_filters": [],
+  "pandoc_filters_by_conversion": {
+    "md_to_docx": [],
+    "html_to_docx": [],
+    "html_to_md": [],
+    "md_to_html": [],
+    "md_to_rtf": [],
+    "md_to_latex": []
+  },
+  "extensible_workflows": {
+    "html": {
+      "enabled": true,
+      "apps": [],
+      "keep_formula_latex": true
+    },
+    "md": {
+      "enabled": true,
+      "apps": [],
+      "html_formatting": {
+        "css_font_to_semantic": true,
+        "bold_first_row_to_header": true
+      }
+    },
+    "latex": {
+      "enabled": true,
+      "apps": []
+    },
+    "file": {
+      "enabled": true,
+      "apps": []
+    }
+  }
 }
 ```
 
-Key fields:
+Fields:
 
-- `hotkey` — global shortcut syntax such as `<ctrl>+<alt>+v`.
-- `pandoc_path` — executable name or absolute path for Pandoc.
-- `reference_docx` — optional style template consumed by Pandoc.
-- `save_dir` — directory used when generated DOCX files are kept.
-- `keep_file` — store converted DOCX files to disk instead of deleting them.
-- `notify` — show system notifications when conversions finish.
-- `enable_excel` — detect Markdown tables and paste them into Excel automatically.
-- `excel_keep_format` — attempt to preserve bold/italic/code styles inside Excel.
-- `no_app_action` — action when no target app is detected. Values: `open` (auto open), `save` (save only), `clipboard` (copy file to clipboard), `none` (no action). Default: `open`.
-- `md_disable_first_para_indent` / `html_disable_first_para_indent` — normalize the first paragraph style to body text.
-- `html_formatting` — options for formatting HTML rich text before conversion.
-  - `strikethrough_to_del` — convert strikethrough ~~ to `<del>` tags for proper rendering.
-- `move_cursor_to_end` — move the caret to the end of the inserted result.
-- `Keep_original_formula` — keep original math formulas (in LaTeX code form).
-- `language` — UI language: `en-US`, `zh-CN`, or `ja-JP`.
-- `pandoc_request_headers` — request headers passed to Pandoc as `--request-header` when fetching remote resources (e.g. images). Example: `["User-Agent: ...", "Referer: https://www.oschina.net/"]`. Set to `[]` to disable request headers.
-- **`pandoc_filters`** — **✨ New feature** - Custom Pandoc Filter list. Add `.lua` scripts or executable file paths; filters execute in list order. Extends Pandoc conversion with custom format processing, special syntax transformation, etc. Default: empty list. Example: `["%APPDATA%\\npm\\mermaid-filter.cmd"]` for Mermaid diagram support.
+* `hotkey`: global hotkey syntax, e.g. `<ctrl>+<alt>+v`.
+* `pandoc_path`: Pandoc executable path.
+* `reference_docx`: optional Pandoc reference template.
+* `save_dir`: output directory when keeping files.
+* `keep_file`: keep generated DOCX files or delete them.
+* `notify`: show system notifications.
+* `startup_notify`: show a notification on startup.
+* **`enable_excel`**: enable smart Markdown table detection and paste into Excel (default true).
+* **`excel_keep_format`**: keep Markdown formatting (bold/italic/code, etc.) when pasting into Excel (default true).
+* `paste_delay_s`: delay in seconds before pasting (Windows may need a short delay for clipboard updates).
+* **`no_app_action`**: default action when no target app (Word/Excel) is detected (default `"open"`). Options: `open`=auto open, `save`=save only, `clipboard`=copy file to clipboard, `none`=no action.
+* **`md_disable_first_para_indent`**: disable special formatting for the first paragraph when converting Markdown (default true).
+* **`html_formatting`**: formatting options for HTML rich text conversion.
+  * **`strikethrough_to_del`**: convert ~~ strikethrough to `<del>` for correct rendering (default true).
+* **`html_disable_first_para_indent`**: disable special formatting for the first paragraph when converting HTML rich text (default true).
+* **`move_cursor_to_end`**: move the caret to the end after inserting (default true).
+* **`Keep_original_formula`**: keep original math formulas (LaTeX code form).
+* `enable_latex_replacements`: auto-fix some incompatible LaTeX syntax (e.g. replace `{\\kern 10pt}` with `\\qquad`).
+* `fix_single_dollar_block`: auto-detect and fix standalone `$ ... $` formula blocks (convert to `$$ ... $$`).
+* `language`: UI language. `zh-CN` (Simplified Chinese), `en-US` (English), `ja-JP` (Japanese).
+* `pandoc_request_headers`: request headers for Pandoc when downloading remote resources (one `Header: Value` per line).
+* **`pandoc_filters`**: custom Pandoc Filter list. Add `.lua` scripts or executable paths; filters run in list order. Extends conversion functions (custom formatting, special syntax transforms, etc.). Default empty. Example: `["%APPDATA%\\npm\\mermaid-filter.cmd"]` enables Mermaid diagrams.
+* `pandoc_filters_by_conversion`: configure Filters per conversion type (e.g. `md_to_docx`, `html_to_md`, etc.).
+* `extensible_workflows`: app extension settings (match by app/window title and choose paste mode). See below.
+
+Apply changes via the tray menu **“Reload config/hotkey”**.
 
 ---
 
@@ -170,7 +229,7 @@ Key fields:
 
 ### What are Pandoc Filters?
 
-Pandoc Filters are plugin programs that process document content during conversion. PasteMD supports configuring multiple filters that execute sequentially to extend functionality.
+Pandoc Filters are plugin programs that process content during conversion. PasteMD supports configuring multiple filters that execute sequentially to extend functionality.
 
 ### Use Case Example: Mermaid Diagram Support
 
@@ -187,7 +246,7 @@ npm install --global mermaid-filter
 <details>
 <summary>⚠️ <b>Troubleshooting: Chrome Download Failure</b></summary>
 
-Installing mermaid-filter requires downloading Chromium browser. If automatic download fails, you can download it manually:
+Installing mermaid-filter requires downloading Chromium. If automatic download fails, you can download it manually:
 
 **Step 1: Find Required Chromium Version**
 
@@ -198,7 +257,6 @@ Find content like:
 chromium: "1108766";
 ```
 Or in the error message, e.g.:
-
 ```bash
 npm error Error: Download failed: server returned code 502. URL: https://npmmirror.com/mirrors/chromium-browser-snapshots/Win_x64/1108766/chrome-win.zip
 ```
@@ -269,31 +327,89 @@ The Mermaid diagram will be rendered as an image and inserted into Word.
 
 ---
 
-## Tray Menu
+## 🧩 App Extensions (Custom Paste Workflows)
 
-- Show the current global hotkey (read-only).
-- Enable/disable the hotkey.
-- Toggle notifications, set the action when no target app is detected, and toggle moving the caret to the end after paste.
-- Enable or disable Excel-specific features and formatting preservation.
-- Toggle keeping generated DOCX files.
-- HTML Formatting: toggle conversion of strikethrough ~~ to `<del>` tags for proper rendering.
-- Keep_original_formula: Whether to preserve the original mathematical formula in its LaTeX code form.
-- Open save directory, view logs, edit configuration, or reload hotkeys.
-- Check for updates and view installed version.
-- Quit PasteMD.
+In Settings → **App Extensions**, you can configure paste modes per app and match by window title (regex supported):
+
+* **HTML** / **Markdown** / **LaTeX** / **File**: choose the most suitable paste mode for each target app
+  - HTML/Markdown suit rich-text note apps (e.g., Yuque)
+  - LaTeX suits academic sites like Overleaf
+  - File suits apps like QQ/WeChat that accept file attachments
+
+> Tip: for the same app, configure only one workflow to avoid conflicts; use “window title matching” when needed.
+
+Example config (excerpt):
+
+> On Windows, `id` is usually the app's exe path; on macOS it's the bundle id (recommended to add via the settings UI for auto-fill).
+
+```json
+{
+  "extensible_workflows": {
+    "html": {
+      "enabled": true,
+      "apps": [
+        {
+          "name": "Yuque",
+          "id": "/path/yuque.exe",
+          "window_patterns": []
+        }
+      ],
+      "keep_formula_latex": true
+    },
+    "latex": {
+      "enabled": true,
+      "apps": [
+        {
+          "name": "chrome",
+          "id": "/path/chrome.exe",
+          "window_patterns": [
+            ".*overleaf.*"
+          ]
+        }
+      ]
+    },
+    "file": {
+      "enabled": true,
+      "apps": [
+        {
+          "name": "QQ",
+          "id": "/path/qq.exe",
+          "window_patterns": []
+        }
+      ]
+    }
+  }
+}
+```
 
 ---
 
-## Build From Source
+## Tray Menu
 
-Recommended environment: Python 3.12 (64-bit).
+* Quick view: current global hotkey (read-only).
+* Enable hotkey: toggle global hotkey.
+* Popup notifications: toggle system notifications.
+* No app action: default action when Word/WPS/Excel is not detected (auto open / save only / copy to clipboard / none).
+* Move cursor to end: move caret to end after insertion.
+* HTML formatting: toggle **strikethrough ~~ to `<del>`** and other HTML cleanup for correct conversion.
+* Set hotkey: record and save a new global hotkey in the UI (takes effect immediately).
+* Keep generated files: when enabled, DOCX files are saved to `save_dir`.
+* Open save directory, view logs, edit config, reload config/hotkey.
+* Version: show current version; check for updates; when available, show item and open download page.
+* Quit: exit the app.
+
+---
+
+## 📦 Run From Source / Build
+
+Recommended: Python 3.12 (64-bit).
 
 ```bash
 pip install -r requirements.txt
 python main.py
 ```
 
-Packaged build (PyInstaller):
+Using PyInstaller:
 
 ```bash
 pyinstaller --clean -F -w -n PasteMD
@@ -305,13 +421,13 @@ pyinstaller --clean -F -w -n PasteMD
   main.py
 ```
 
-The compiled executable will be placed in `dist/PasteMD.exe`.
+The executable will be generated at `dist/PasteMD.exe`.
 
 ---
 
 ## ⭐ Star
 
-Every star helps — thank you for sharing PasteMD with more users.
+Thanks for every star — please share PasteMD with more users. I am aiming for 4096 stars and will keep working hard!
 
 <img src="../../docs/gif/atri/likeyou.gif"
      alt="like you"
@@ -319,28 +435,28 @@ Every star helps — thank you for sharing PasteMD with more users.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=RICHQAQ/PasteMD&type=date&legend=top-left)](https://www.star-history.com/#RICHQAQ/PasteMD&type=date&legend=top-left)
 
----
-
 ## ☕ Support & Donation
 
+If you have ideas or suggestions, feel free to open an issue! 🤯🤯🤯
 
-If PasteMD saves you time, consider buying the author a coffee — your support helps prioritize fixes, enhancements, and new integrations.
 
-Also welcome to join the **PasteMD User Group** for discussion and support:
-
+You are also welcome to join the **PasteMD user group** to chat with others:
 <div align="center">
-  <img src="../../docs/img/qrcode.jpg" alt="PasteMD QQ Group QR Code" width="200" />
+  <img src="../../docs/img/qrcode.jpg" alt="PasteMD QQ group QR code" width="200" />
   <br>
   <sub>Scan to join the PasteMD QQ group</sub>
 </div>
 
-<img src="../../docs/gif/atri/flower.gif"
-     alt="give you a flower"
-     width="150">
+If this tool helps you, you can buy the author a coffee ☕. Your support motivates ongoing fixes, enhancements, and more scenarios. Thanks for every bit of support!
 
+<img src="../../docs/gif/atri/flower.gif"
+     alt="flower"
+     width="150">
+     
 | Alipay | WeChat |
 | --- | --- |
 | ![Alipay](../../docs/pay/Alipay.jpg) | ![WeChat](../../docs/pay/Weixinpay.png) |
+
 
 ---
 
