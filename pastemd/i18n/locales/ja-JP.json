@@ -85,7 +85,7 @@
     "settings.extensions.window_pattern": "ウィンドウ名",
     "settings.extensions.window_pattern_hint": "ブラウザーのウィンドウタイトルをマッチするオプションの正規表現（1行に1つ）",
     "settings.extensions.edit_window_pattern": "ウィンドウ名パターンを編集",
-    "settings.extensions.description": "注：ここで異なる貼り付け動作を設定できます。\nアプリをダブルクリックしてウィンドウタイトルのマッチ規則を編集します。空欄の場合は全ウィンドウにマッチします。",
+    "settings.extensions.description": "注：ここで異なる貼り付け動作を設定できます\nアプリをダブルクリックしてウィンドウタイトルのマッチ規則を編集します。空欄の場合は全ウィンドウにマッチします。",
     "settings.extensions.reserved_app_error": "アプリケーション {app} は予約済み（Word/WPS/Excel）のため追加できません。",
     "settings.extensions.app_exists": "アプリケーション {app} は既にリストにあります。",
     "settings.extensions.app_conflict_error": "アプリケーション {app} は「{workflow}」に既に設定されています。別のウィンドウ名パターン用にここへ追加しますか？",

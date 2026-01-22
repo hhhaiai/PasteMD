@@ -85,7 +85,7 @@
     "settings.extensions.window_pattern": "Window Name",
     "settings.extensions.window_pattern_hint": "Optional regex patterns to match browser window titles (one per line)",
     "settings.extensions.edit_window_pattern": "Edit Window Name Pattern",
-    "settings.extensions.description": "Note: You can configure different paste behaviors here.\nDouble-click an app to edit window title matching rules. Leave empty to match all windows.",
+    "settings.extensions.description": "Note: You can configure different paste behaviors here\nDouble-click an app to edit window title matching rules. Leave empty to match all windows.",
     "settings.extensions.reserved_app_error": "Application {app} is reserved (Word/WPS/Excel) and cannot be added.",
     "settings.extensions.app_exists": "Application {app} is already in the list.",
     "settings.extensions.app_conflict_error": "Application {app} is already configured in '{workflow}'. Add it here anyway to use different window name patterns?",

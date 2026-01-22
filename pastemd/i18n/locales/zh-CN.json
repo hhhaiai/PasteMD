@@ -85,7 +85,7 @@
     "settings.extensions.window_pattern": "窗口名称",
     "settings.extensions.window_pattern_hint": "可选正则表达式，用于匹配浏览器窗口标题（每行一个）",
     "settings.extensions.edit_window_pattern": "编辑窗口名称匹配",
-    "settings.extensions.description": "注：可在此配置扩展不同需求的粘贴，\n双击应用可编辑窗口名称匹配规则，为空则匹配所有窗口。",
+    "settings.extensions.description": "注：可在此配置扩展不同需求的粘贴\n双击应用可编辑窗口名称匹配规则，为空则匹配所有窗口。",
     "settings.extensions.reserved_app_error": "应用 {app} 是保留应用（Word/WPS/Excel），无法添加。",
     "settings.extensions.app_exists": "应用 {app} 已在列表中。",
     "settings.extensions.app_conflict_error": "应用 {app} 已在「{workflow}」中配置，是否仍要继续添加以匹配不同窗口名称？",
