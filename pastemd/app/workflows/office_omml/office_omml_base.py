@@ -17,6 +17,7 @@ from pastemd.utils.clipboard import (
 )
 from pastemd.utils.html_analyzer import is_plain_html_fragment
 from pastemd.utils.markdown_utils import merge_markdown_contents
+from pastemd.utils.html_formatter import extract_html_body
 from pastemd.utils.omml import convert_html_mathml_to_omml, generate_office_html
 
 
@@ -72,8 +73,11 @@ class OfficeOmmlBaseWorkflow(BaseWorkflow, ABC):
                 md_text, self.config
             )
 
+            # Strip standalone HTML wrapper to avoid nested documents
+            html_body = extract_html_body(html_with_mathml)
+
             # Convert MathML to OMML conditional comments
-            html_with_omml = convert_html_mathml_to_omml(html_with_mathml)
+            html_with_omml = convert_html_mathml_to_omml(html_body)
 
             # Wrap in Office HTML template
             office_html = generate_office_html(html_with_omml)
